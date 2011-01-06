@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<targets>
+
+  <rrlib name="model_fitting">
+    <sources>
+      definitions.h
+      tLeastSquaresPolynomial.h
+      tRansacModel.h
+      tRansacLeastSquaresPolynomial.h
+    </sources>
+  </rrlib>
+
+  <testprogram name="least_squares_polynomial">
+    <sources>
+      test/test_least_squares_polynomial.cpp
+    </sources>
+  </testprogram>
+
+</targets>
