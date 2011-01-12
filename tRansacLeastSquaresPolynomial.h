@@ -84,10 +84,17 @@ public:
 
   typedef typename tLeastSquaresPolynomial::tSample tSample;
 
-  tRansacLeastSquaresPolynomial();
+  tRansacLeastSquaresPolynomial(bool local_optimization = false);
 
-  tRansacLeastSquaresPolynomial(const std::vector<tSample> &measurements,
-                                unsigned int max_iterations, float satisfactory_support_ratio, float max_error);
+  template <typename TIterator>
+  tRansacLeastSquaresPolynomial(TIterator begin, TIterator end,
+                                unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                                bool local_optimization = false);
+
+  template <typename TSTLContainer>
+  explicit tRansacLeastSquaresPolynomial(const TSTLContainer &samples,
+                                         unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                                         bool local_optimization = false);
 
   const size_t MinimalSetSize() const
   {

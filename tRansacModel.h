@@ -81,6 +81,8 @@ public:
 
   typedef TSample tSample;
 
+  tRansacModel(bool local_optimization = false);
+
   virtual ~tRansacModel() = 0;
 
   void Init(unsigned int expected_number_of_samples);

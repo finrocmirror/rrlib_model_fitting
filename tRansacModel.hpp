@@ -71,6 +71,14 @@ namespace model_fitting
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
+// tRansacModel constructors
+//----------------------------------------------------------------------
+template <typename TSample>
+tRansacModel<TSample>::tRansacModel(bool local_optimization)
+    : local_optimization(local_optimization)
+{}
+
+//----------------------------------------------------------------------
 // tRansacModel destructor
 //----------------------------------------------------------------------
 template <typename TSample>

@@ -75,26 +75,44 @@ tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial()
 {}
 
 template <size_t Tdegree>
-tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial(const std::vector<tSample> &samples)
+template <typename TIterator>
+tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial(TIterator begin, TIterator end)
     : sigma(0)
 {
-  this->DoLinearRegression(samples);
+  this->UpdateModelFromSampleSet(begin, end);
+}
+
+template <size_t Tdegree>
+template <typename TSTLContainer>
+tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial(const TSTLContainer &samples)
+    : sigma(0)
+{
+  this->UpdateModelFromSampleSet(samples);
 }
 
 //----------------------------------------------------------------------
 // tLeastSquaresPolynomial UpdateModelFromSampleSet
 //----------------------------------------------------------------------
 template <size_t Tdegree>
-void tLeastSquaresPolynomial<Tdegree>::UpdateModelFromSampleSet(const std::vector<tSample> &samples)
+template <typename TIterator>
+void tLeastSquaresPolynomial<Tdegree>::UpdateModelFromSampleSet(TIterator begin, TIterator end)
 {
-  this->DoLinearRegression(samples);
+  this->DoLinearRegression(begin, end);
+}
+
+template <size_t Tdegree>
+template <typename TSTLContainer>
+void tLeastSquaresPolynomial<Tdegree>::UpdateModelFromSampleSet(const TSTLContainer &samples)
+{
+  this->DoLinearRegression(samples.begin(), samples.end());
 }
 
 //----------------------------------------------------------------------
 // tLeastSquaresPolynomial DoLinearRegression
 //----------------------------------------------------------------------
 template <size_t Tdegree>
-void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(const std::vector<tSample> &samples)
+template <typename TIterator>
+void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(TIterator begin, TIterator end)
 {
   /*
    * After some derivation work doing linear regression in this case means solving
@@ -108,7 +126,7 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(const std::vector<tSam
   rrlib::math::tMatrix < Tdegree + 1, Tdegree + 1, double, rrlib::math::matrix::Symmetrical > A;
   rrlib::math::tVector < Tdegree + 1, double > b;
 
-  for (std::vector<tSample>::const_iterator it = samples.begin(); it != samples.end(); ++it)
+  for (TIterator it = begin; it != end; ++it)
   {
     RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Considering sample ", *it);
 
@@ -142,12 +160,14 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(const std::vector<tSam
   }
 
   // calculate standard deviation
-  for (std::vector<tSample>::const_iterator it = samples.begin(); it != samples.end(); ++it)
+  size_t number_of_samples = 0;
+  for (TIterator it = begin; it != end; ++it)
   {
     double error = it->Y() - (*this)(it->X());
     this->sigma += error * error;
+    number_of_samples++;
   }
-  this->sigma = std::sqrt(this->sigma / (samples.size() - 1));
+  this->sigma = std::sqrt(this->sigma / (number_of_samples - 1));
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "sigma = ", this->sigma);
 }

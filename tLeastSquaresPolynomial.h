@@ -85,21 +85,30 @@ public:
 
   /*!
    */
-  tLeastSquaresPolynomial(const std::vector<tSample> &samples);
+  template <typename TIterator>
+  tLeastSquaresPolynomial(TIterator begin, TIterator end);
+
+  template <typename TSTLContainer>
+  explicit tLeastSquaresPolynomial(const TSTLContainer &samples);
 
   inline double GetStandardDeviation() const
   {
     return this->sigma;
   }
 
-  void UpdateModelFromSampleSet(const std::vector<tSample> &samples);
+  template <typename TIterator>
+  void UpdateModelFromSampleSet(TIterator begin, TIterator end);
+
+  template <typename TSTLContainer>
+  void UpdateModelFromSampleSet(const TSTLContainer &samples);
 
 //----------------------------------------------------------------------
 // Protected methods
 //----------------------------------------------------------------------
 protected:
 
-  void DoLinearRegression(const std::vector<tSample> &samples);
+  template <typename TIterator>
+  void DoLinearRegression(TIterator begin, TIterator end);
 
 //----------------------------------------------------------------------
 // Private fields and methods
