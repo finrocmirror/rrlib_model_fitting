@@ -19,24 +19,25 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    tRansacLeastSquaresPolynomial.h
+/*!\file    tRansacPlane3D.h
  *
+ * \author  Tim Braun
  * \author  Tobias Foehst
  *
- * \date    2010-09-30
+ * \date    2007-11-16
  *
- * \brief   Contains tRansacLeastSquaresPolynomial
+ * \brief   Contains tRansacPlane3D
  *
- * \b tRansacLeastSquaresPolynomial
+ * \b tRansacPlane3D
  *
- * A few words for tRansacLeastSquaresPolynomial
+ * A few words for tRansacPlane3D
  *
  */
 //----------------------------------------------------------------------
-#ifndef _rrlib_model_fitting_tRansacLeastSquaresPolynomial_h_
-#define _rrlib_model_fitting_tRansacLeastSquaresPolynomial_h_
+#ifndef _rrlib_model_fitting_tRansacPlane3D_h_
+#define _rrlib_model_fitting_tRansacPlane3D_h_
 
-#include "rrlib/model_fitting/tLeastSquaresPolynomial.h"
+#include "rrlib/geometry/tPlane.h"
 #include "rrlib/model_fitting/tRansacModel.h"
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
@@ -65,40 +66,37 @@ namespace model_fitting
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
-//! Short description of tRansacLeastSquaresPolynomial
-/*! A more detailed description of tRansacLeastSquaresPolynomial, which
+//! Short description of tRansacPlane3D
+/*! A more detailed description of tRansacPlane3D, which
     Tobias Foehst hasn't done yet !!
 */
-template <size_t Tdegree>
-class tRansacLeastSquaresPolynomial : public tLeastSquaresPolynomial<Tdegree>,
-    public tRansacModel<typename tLeastSquaresPolynomial<Tdegree>::tSample>
+class tRansacPlane3D : public geometry::tPlane3D, public tRansacModel<geometry::tPlane3D::tPoint>
 {
 
-  typedef model_fitting::tRansacModel<typename tLeastSquaresPolynomial<Tdegree>::tSample> tRansacModel;
-  typedef model_fitting::tLeastSquaresPolynomial<Tdegree> tLeastSquaresPolynomial;
+  typedef model_fitting::tRansacModel<geometry::tPlane3D::tPoint> tRansacModel;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
-  typedef typename tLeastSquaresPolynomial::tSample tSample;
+  typedef geometry::tPlane3D::tPoint tSample;
 
-  tRansacLeastSquaresPolynomial(bool local_optimization = false);
+  tRansacPlane3D(bool local_optimization = false);
 
   template <typename TIterator>
-  tRansacLeastSquaresPolynomial(TIterator begin, TIterator end,
-                                unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
-                                bool local_optimization = false);
+  tRansacPlane3D(TIterator begin, TIterator end,
+                 unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                 bool local_optimization = false);
 
   template <typename TSTLContainer>
-  explicit tRansacLeastSquaresPolynomial(const TSTLContainer &samples,
-                                         unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
-                                         bool local_optimization = false);
+  explicit tRansacPlane3D(const TSTLContainer &samples,
+                          unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                          bool local_optimization = false);
 
   const size_t MinimalSetSize() const
   {
-    return Tdegree + 1;
+    return 3;
   }
 
 //----------------------------------------------------------------------
@@ -108,7 +106,7 @@ private:
 
   virtual const char *GetLogDescription() const
   {
-    return "tRansacLeastSquaresPolynomial";
+    return "tRansacPlane3D";
   }
 
   virtual const bool FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set);
@@ -122,7 +120,5 @@ private:
 //----------------------------------------------------------------------
 }
 }
-
-#include "rrlib/model_fitting/tRansacLeastSquaresPolynomial.hpp"
 
 #endif

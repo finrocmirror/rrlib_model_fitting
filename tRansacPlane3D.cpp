@@ -19,19 +19,22 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    tRansacLeastSquaresPolynomial.hpp
+/*!\file    tRansacPlane3D.hpp
  *
+ * \author  Tim Braun
  * \author  Tobias Foehst
  *
- * \date    2010-09-30
+ * \date    2007-11-16
  *
  */
 //----------------------------------------------------------------------
+#include "rrlib/model_fitting/tRansacPlane3D.h"
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include <vector>
+#include <cv.h>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -45,12 +48,9 @@
 #include <cassert>
 
 //----------------------------------------------------------------------
-// Namespace declaration
+// Namespace usage
 //----------------------------------------------------------------------
-namespace rrlib
-{
-namespace model_fitting
-{
+using namespace rrlib::model_fitting;
 
 //----------------------------------------------------------------------
 // Forward declarations / typedefs / enums
@@ -65,18 +65,16 @@ namespace model_fitting
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-// tRansacLeastSquaresPolynomial constructors
+// tRansacPlane3D constructors
 //----------------------------------------------------------------------
-template <size_t Tdegree>
-tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(bool local_optimization)
+tRansacPlane3D::tRansacPlane3D(bool local_optimization)
     : tRansacModel(local_optimization)
 {}
 
-template <size_t Tdegree>
 template <typename TIterator>
-tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(TIterator begin, TIterator end,
-    unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
-    bool local_optimization)
+tRansacPlane3D::tRansacPlane3D(TIterator begin, TIterator end,
+                               unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                               bool local_optimization)
     : tRansacModel(local_optimization)
 {
   this->Init(std::distance(begin, end));
@@ -87,11 +85,10 @@ tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(TIterator 
   this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error);
 }
 
-template <size_t Tdegree>
 template <typename TSTLContainer>
-tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(const TSTLContainer &samples,
-    unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
-    bool local_optimization)
+tRansacPlane3D::tRansacPlane3D(const TSTLContainer &samples,
+                               unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                               bool local_optimization)
     : tRansacModel(local_optimization)
 {
   this->Init(samples.size());
@@ -103,52 +100,81 @@ tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(const TSTL
 }
 
 //----------------------------------------------------------------------
-// tRansacLeastSquaresPolynomial FitToMinimalSampleSet
+// tRansacPlane3D FitToMinimalSampleSet
 //----------------------------------------------------------------------
-template <size_t Tdegree>
-const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set)
+const bool tRansacPlane3D::FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set)
 {
-  // ensure distinct points
-  for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
-  {
-    for (std::vector<size_t>::const_iterator kt = it; kt != sample_index_set.end(); ++kt)
-    {
-      if ((this->GetSamples()[*it] - this->GetSamples()[*kt]).IsZero())
-      {
-        return false;
-      }
-    }
-  }
-  return this->FitToSampleIndexSet(sample_index_set);
-}
+  const tSample &p1(this->GetSamples()[sample_index_set[0]]);
+  const tSample &p2(this->GetSamples()[sample_index_set[1]]);
+  const tSample &p3(this->GetSamples()[sample_index_set[2]]);
 
-//----------------------------------------------------------------------
-// tRansacLeastSquaresPolynomial FitToSampleSet
-//----------------------------------------------------------------------
-template <size_t Tdegree>
-const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToSampleIndexSet(const std::vector<size_t> &sample_index_set)
-{
-  std::vector<tSample> chosen_samples;
-  chosen_samples.reserve(sample_index_set.size());
-  for (typename std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
+  tSample p1_p2(p2 - p1);
+  tSample p1_p3(p3 - p1);
+  tSample p2_p3(p3 - p2);
+
+  // ensure distinct points
+  if (p1_p2.IsZero() || p1_p3.IsZero() || p2_p3.IsZero())
   {
-    chosen_samples.push_back(this->GetSamples()[*it]);
+    return false;
   }
-  this->UpdateModelFromSampleSet(chosen_samples);
+
+  // ensure that chosen points are not colinear
+  if (p1_p2 * p1_p3 > 0.999)
+  {
+    return false;
+  }
+
+  this->Set(p1, p2, p3);
   return true;
 }
 
 //----------------------------------------------------------------------
-// tRansacLeastSquaresPolynomial GetSampleError
+// tRansacPlane3D FitToSampleSet
 //----------------------------------------------------------------------
-template <size_t Tdegree>
-const float tRansacLeastSquaresPolynomial<Tdegree>::GetSampleError(const tSample &sample) const
+const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample_index_set)
 {
-  return AbsoluteValue(sample.Y() - (*this)(sample.X()));
+  // perform PCA
+  tPoint center_of_gravity;
+  for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
+  {
+    center_of_gravity += this->GetSamples()[*it];
+  }
+  center_of_gravity /= sample_index_set.size();
+
+  double covariance[9];
+  CvMat cv_covariance = cvMat(3, 3, CV_64FC1, covariance);
+  for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
+  {
+    tSample centered_point = this->GetSamples()[*it] - center_of_gravity;
+
+    covariance[0] = centered_point.X() * centered_point.X();
+    covariance[1] = covariance[3] = centered_point.X() * centered_point.Y();
+    covariance[2] = covariance[6] = centered_point.X() * centered_point.Z();
+    covariance[4] = centered_point.Y() * centered_point.Y();
+    covariance[5] = covariance[7] = centered_point.Y() * centered_point.Z();
+    covariance[8] = centered_point.Z() * centered_point.Z();
+  }
+
+  double s[9];
+  double u[9];
+  CvMat cv_s = cvMat(3, 3, CV_64FC1, s);
+  CvMat cv_u = cvMat(3, 3, CV_64FC1, u);
+  cvSVD(&cv_covariance, &cv_s, &cv_u, 0, CV_SVD_MODIFY_A | CV_SVD_U_T);
+
+  if (math::IsEqual(s[8], 0))
+  {
+    return false;
+  }
+
+  // use weakest component as plane normal
+  this->Set(center_of_gravity, math::tVec3d(u[6], u[7], u[8]));
+  return true;
 }
 
 //----------------------------------------------------------------------
-// End of namespace declaration
+// tRansacPlane3D GetSampleError
 //----------------------------------------------------------------------
-}
+const float tRansacPlane3D::GetSampleError(const tSample &sample) const
+{
+  return this->GetDistanceToPoint(sample);
 }

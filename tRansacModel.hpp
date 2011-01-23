@@ -21,6 +21,7 @@
 //----------------------------------------------------------------------
 /*!\file    tRansacModel.hpp
  *
+ * \author  Tim Braun
  * \author  Tobias Foehst
  *
  * \date    2007-11-16
@@ -93,6 +94,7 @@ void tRansacModel<TSample>::Init(unsigned int expected_number_of_samples)
 {
   this->Clear();
   this->samples.reserve(expected_number_of_samples);
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Initialized for ", expected_number_of_samples, " samples.");
 }
 
 //----------------------------------------------------------------------
@@ -103,6 +105,7 @@ void tRansacModel<TSample>::Clear()
 {
   this->samples.clear();
   this->assignments.clear();
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Model cleared.");
 }
 
 //----------------------------------------------------------------------
@@ -111,6 +114,8 @@ void tRansacModel<TSample>::Clear()
 template <typename TSample>
 const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, float satisfactory_support_ratio, float max_error)
 {
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Performing RANSAC algorithm.");
+
   if (this->samples.size() < this->MinimalSetSize())
   {
     RRLIB_LOG_STREAM(logging::eLL_ERROR, "At least ", this->MinimalSetSize(), " samples must be added to construct model!");

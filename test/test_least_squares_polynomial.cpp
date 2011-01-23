@@ -40,7 +40,6 @@
 //----------------------------------------------------------------------
 #include "rrlib/highgui_wrapper/tWindow.h"
 
-#include "rrlib/model_fitting/definitions.h"
 #include "rrlib/model_fitting/tLeastSquaresPolynomial.h"
 #include "rrlib/model_fitting/tRansacLeastSquaresPolynomial.h"
 
@@ -91,8 +90,6 @@ int main(int argc, char **argv)
   rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainConfiguresSubTree(".", true);
   rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_3);
   rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainPrintsLocation(".", false);
-
-  rrlib::math::tCholeskyDecomposition<3>(rrlib::math::tMatrix<3, 3, double, rrlib::math::matrix::Symmetrical>(1, 2, 3, 2, 12, 4, 3, 4, 12));
 
   tWindow &window = tWindow::GetInstance("Least Squares Polynomial Tests", 500, 500);
 
