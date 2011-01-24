@@ -85,7 +85,7 @@ public:
 
   virtual ~tRansacModel() = 0;
 
-  void Init(unsigned int expected_number_of_samples);
+  void Initialize(unsigned int expected_number_of_samples);
 
   void Clear();
 
@@ -99,7 +99,7 @@ public:
     this->local_optimization = enabled;
   }
 
-  const bool DoRANSAC(unsigned int max_iterations, float satisfactory_support_ratio, float max_error);
+  const bool DoRANSAC(unsigned int max_iterations, double satisfactory_support_ratio = 1.0, double max_error = 1E-6);
 
   inline const std::vector<tSample> &GetSamples() const
   {
@@ -132,7 +132,7 @@ private:
 
   virtual const bool FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set) = 0;
   virtual const bool FitToSampleIndexSet(const std::vector<size_t> &sample_index_set) = 0;
-  virtual const float GetSampleError(const tSample &sample) const = 0;
+  virtual const double GetSampleError(const tSample &sample) const = 0;
 
 };
 

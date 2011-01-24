@@ -73,30 +73,115 @@ tRansacPlane3D::tRansacPlane3D(bool local_optimization)
 
 template <typename TIterator>
 tRansacPlane3D::tRansacPlane3D(TIterator begin, TIterator end,
-                               unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                               unsigned int max_iterations, double satisfactory_support_ratio, double max_error,
                                bool local_optimization)
     : tRansacModel(local_optimization)
 {
-  this->Init(std::distance(begin, end));
+  this->Initialize(std::distance(begin, end));
   for (TIterator it = begin; it != end; ++it)
   {
     this->AddSample(*it);
   }
-  this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error);
+  if (!this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error))
+  {
+    throw std::runtime_error("Failed to fit RANSAC model during construction!");
+  }
 }
 
-template <typename TSTLContainer>
-tRansacPlane3D::tRansacPlane3D(const TSTLContainer &samples,
-                               unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+template <typename TIterator>
+tRansacPlane3D::tRansacPlane3D(TIterator begin, TIterator end,
+                               const math::tVec3d &normal_constraint_direction, math::tAngleRadUnsigned normal_constraint_max_angle_distance,
+                               unsigned int max_iterations, double satisfactory_support_ratio, double max_error,
                                bool local_optimization)
     : tRansacModel(local_optimization)
 {
-  this->Init(samples.size());
-  for (typename TSTLContainer::const_iterator it = samples.begin(); it != samples.end(); ++it)
+  this->Initialize(std::distance(begin, end));
+  for (TIterator it = begin; it != end; ++it)
   {
     this->AddSample(*it);
   }
-  this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error);
+  this->SetNormalConstraint(normal_constraint_direction, normal_constraint_max_angle_distance);
+  if (!this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error))
+  {
+    throw std::runtime_error("Failed to fit RANSAC model during construction!");
+  }
+}
+
+template <typename TIterator>
+tRansacPlane3D::tRansacPlane3D(TIterator begin, TIterator end,
+                               const geometry::tPlane3D::tPoint &point_constraint_reference_point, double point_constraint_min_distance, double point_constraint_max_distance,
+                               unsigned int max_iterations, double satisfactory_support_ratio, double max_error,
+                               bool local_optimization)
+    : tRansacModel(local_optimization)
+{
+  this->Initialize(std::distance(begin, end));
+  for (TIterator it = begin; it != end; ++it)
+  {
+    this->AddSample(*it);
+  }
+  this->SetPointConstraint(point_constraint_reference_point, point_constraint_min_distance, point_constraint_max_distance);
+  if (!this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error))
+  {
+    throw std::runtime_error("Failed to fit RANSAC model during construction!");
+  }
+}
+
+template <typename TIterator>
+tRansacPlane3D::tRansacPlane3D(TIterator begin, TIterator end,
+                               const math::tVec3d &normal_constraint_direction, math::tAngleRadUnsigned normal_constraint_max_angle_distance,
+                               const geometry::tPlane3D::tPoint &point_constraint_reference_point, double point_constraint_min_distance, double point_constraint_max_distance,
+                               unsigned int max_iterations, double satisfactory_support_ratio, double max_error,
+                               bool local_optimization)
+    : tRansacModel(local_optimization)
+{
+  this->Initialize(std::distance(begin, end));
+  for (TIterator it = begin; it != end; ++it)
+  {
+    this->AddSample(*it);
+  }
+  this->SetNormalConstraint(normal_constraint_direction, normal_constraint_max_angle_distance);
+  this->SetPointConstraint(point_constraint_reference_point, point_constraint_min_distance, point_constraint_max_distance);
+  if (!this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error))
+  {
+    throw std::runtime_error("Failed to fit RANSAC model during construction!");
+  }
+}
+
+//----------------------------------------------------------------------
+// tRansacPlane3D SetNormalConstraint
+//----------------------------------------------------------------------
+void tRansacPlane3D::SetNormalConstraint(const math::tVec3d &direction, math::tAngleRadUnsigned max_angle_distance)
+{
+  this->normal_constraint.active = true;
+  this->normal_constraint.direction = direction;
+  this->normal_constraint.max_angle_distance = max_angle_distance;
+}
+
+//----------------------------------------------------------------------
+// tRansacPlane3D SetPointConstraint
+//----------------------------------------------------------------------
+void tRansacPlane3D::SetPointConstraint(const geometry::tPlane3D::tPoint &reference_point, double min_distance, double max_distance)
+{
+  this->point_constraint.active = true;
+  this->point_constraint.reference_point = reference_point;
+  this->point_constraint.min_distance = min_distance;
+  this->point_constraint.max_distance = max_distance;
+}
+
+//----------------------------------------------------------------------
+// tRansacPlane3D ClearNormalConstraint
+//----------------------------------------------------------------------
+void tRansacPlane3D::ClearNormalConstraint()
+{
+  this->normal_constraint.active = false;
+}
+
+//----------------------------------------------------------------------
+// tRansacPlane3D ClearPointConstraint
+//----------------------------------------------------------------------
+void tRansacPlane3D::ClearPointConstraint()
+{
+  this->point_constraint.active = false;
 }
 
 //----------------------------------------------------------------------
@@ -125,6 +210,25 @@ const bool tRansacPlane3D::FitToMinimalSampleIndexSet(const std::vector<size_t> 
   }
 
   this->Set(p1, p2, p3);
+
+  // check constraints
+  if (this->normal_constraint.active)
+  {
+    if (std::acos(this->Normal() * this->normal_constraint.direction) > this->normal_constraint.max_angle_distance)
+    {
+      return false;
+    }
+  }
+
+  if (this->point_constraint.active)
+  {
+    double distance = this->GetDistanceToPoint(this->point_constraint.reference_point);
+    if (distance < this->point_constraint.min_distance || distance > this->point_constraint.max_distance)
+    {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -174,7 +278,7 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
 //----------------------------------------------------------------------
 // tRansacPlane3D GetSampleError
 //----------------------------------------------------------------------
-const float tRansacPlane3D::GetSampleError(const tSample &sample) const
+const double tRansacPlane3D::GetSampleError(const tSample &sample) const
 {
   return this->GetDistanceToPoint(sample);
 }

@@ -87,10 +87,10 @@ tRansacModel<TSample>::~tRansacModel()
 {}
 
 //----------------------------------------------------------------------
-// tRansacModel Init
+// tRansacModel Initialize
 //----------------------------------------------------------------------
 template <typename TSample>
-void tRansacModel<TSample>::Init(unsigned int expected_number_of_samples)
+void tRansacModel<TSample>::Initialize(unsigned int expected_number_of_samples)
 {
   this->Clear();
   this->samples.reserve(expected_number_of_samples);
@@ -112,7 +112,7 @@ void tRansacModel<TSample>::Clear()
 // tRansacModel DoRANSAC
 //----------------------------------------------------------------------
 template <typename TSample>
-const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, float satisfactory_support_ratio, float max_error)
+const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double satisfactory_support_ratio, double max_error)
 {
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Performing RANSAC algorithm.");
 

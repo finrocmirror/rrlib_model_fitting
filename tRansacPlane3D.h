@@ -46,6 +46,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
+#include "rrlib/math/tAngle.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -86,23 +87,62 @@ public:
 
   template <typename TIterator>
   tRansacPlane3D(TIterator begin, TIterator end,
-                 unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+                 unsigned int max_iterations = 50, double satisfactory_support_ratio = 1.0, double max_error = 1E-6,
                  bool local_optimization = false);
 
-  template <typename TSTLContainer>
-  explicit tRansacPlane3D(const TSTLContainer &samples,
-                          unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
-                          bool local_optimization = false);
+  template <typename TIterator>
+  tRansacPlane3D(TIterator begin, TIterator end,
+                 const math::tVec3d &normal_constraint_direction, math::tAngleRadUnsigned normal_constraint_max_angle_distance,
+                 unsigned int max_iterations = 50, double satisfactory_support_ratio = 1.0, double max_error = 1E-6,
+                 bool local_optimization = false);
+
+  template <typename TIterator>
+  tRansacPlane3D(TIterator begin, TIterator end,
+                 const geometry::tPlane3D::tPoint &point_constraint_reference_point, double point_constraint_min_distance, double point_constraint_max_distance,
+                 unsigned int max_iterations = 50, double satisfactory_support_ratio = 1.0, double max_error = 1E-6,
+                 bool local_optimization = false);
+
+  template <typename TIterator>
+  tRansacPlane3D(TIterator begin, TIterator end,
+                 const math::tVec3d &normal_constraint_direction, math::tAngleRadUnsigned normal_constraint_max_angle_distance,
+                 const geometry::tPlane3D::tPoint &point_constraint_reference_point, double point_constraint_min_distance, double point_constraint_max_distance,
+                 unsigned int max_iterations = 50, double satisfactory_support_ratio = 1.0, double max_error = 1E-6,
+                 bool local_optimization = false);
 
   const size_t MinimalSetSize() const
   {
     return 3;
   }
 
+  void SetNormalConstraint(const math::tVec3d &direction, math::tAngleRadUnsigned max_angle_distance);
+
+  void SetPointConstraint(const geometry::tPlane3D::tPoint &reference_point, double min_distance, double max_distance);
+
+  void ClearNormalConstraint();
+
+  void ClearPointConstraint();
+
 //----------------------------------------------------------------------
 // Private fields and methods
 //----------------------------------------------------------------------
 private:
+
+  struct tNormalConstraint
+  {
+    bool active;
+    math::tVec3d direction;
+    math::tAngleRadUnsigned max_angle_distance;
+    tNormalConstraint() : active(false) {}
+  } normal_constraint;
+
+  struct tPointConstraint
+  {
+    bool active;
+    geometry::tPlane3D::tPoint reference_point;
+    double min_distance;
+    double max_distance;
+    tPointConstraint() : active(false) {}
+  } point_constraint;
 
   virtual const char *GetLogDescription() const
   {
@@ -111,7 +151,7 @@ private:
 
   virtual const bool FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set);
   virtual const bool FitToSampleIndexSet(const std::vector<size_t> &sample_index_set);
-  virtual const float GetSampleError(const tSample &sample) const;
+  virtual const double GetSampleError(const tSample &sample) const;
 
 };
 

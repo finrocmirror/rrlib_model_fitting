@@ -75,31 +75,19 @@ tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(bool local
 template <size_t Tdegree>
 template <typename TIterator>
 tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(TIterator begin, TIterator end,
-    unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
+    unsigned int max_iterations, double satisfactory_support_ratio, double max_error,
     bool local_optimization)
     : tRansacModel(local_optimization)
 {
-  this->Init(std::distance(begin, end));
+  this->Initialize(std::distance(begin, end));
   for (TIterator it = begin; it != end; ++it)
   {
     this->AddSample(*it);
   }
-  this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error);
-}
-
-template <size_t Tdegree>
-template <typename TSTLContainer>
-tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(const TSTLContainer &samples,
-    unsigned int max_iterations, float satisfactory_support_ratio, float max_error,
-    bool local_optimization)
-    : tRansacModel(local_optimization)
-{
-  this->Init(samples.size());
-  for (typename TSTLContainer::const_iterator it = samples.begin(); it != samples.end(); ++it)
+  if (!this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error))
   {
-    this->AddSample(*it);
+    throw std::runtime_error("Failed to fit RANSAC model during construction!");
   }
-  this->DoRANSAC(max_iterations, satisfactory_support_ratio, max_error);
 }
 
 //----------------------------------------------------------------------
@@ -142,7 +130,7 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToSampleIndexSet(const std
 // tRansacLeastSquaresPolynomial GetSampleError
 //----------------------------------------------------------------------
 template <size_t Tdegree>
-const float tRansacLeastSquaresPolynomial<Tdegree>::GetSampleError(const tSample &sample) const
+const double tRansacLeastSquaresPolynomial<Tdegree>::GetSampleError(const tSample &sample) const
 {
   return AbsoluteValue(sample.Y() - (*this)(sample.X()));
 }

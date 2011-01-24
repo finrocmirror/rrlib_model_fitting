@@ -19,28 +19,29 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    tRansacLeastSquaresPolynomial.h
+/*!\file    tCondensation.h
  *
  * \author  Tobias Foehst
  *
- * \date    2010-09-30
+ * \date    2011-01-19
  *
- * \brief   Contains tRansacLeastSquaresPolynomial
+ * \brief   Contains tCondensation
  *
- * \b tRansacLeastSquaresPolynomial
+ * \b tCondensation
  *
- * A few words for tRansacLeastSquaresPolynomial
+ * A few words for tCondensation
  *
  */
 //----------------------------------------------------------------------
-#ifndef _rrlib_model_fitting_tRansacLeastSquaresPolynomial_h_
-#define _rrlib_model_fitting_tRansacLeastSquaresPolynomial_h_
+#ifndef _rrlib_model_fitting_tCondensation_h_
+#define _rrlib_model_fitting_tCondensation_h_
 
-#include "rrlib/model_fitting/tLeastSquaresPolynomial.h"
-#include "rrlib/model_fitting/tRansacModel.h"
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
+#include <vector>
+
+#include <cv.h>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -65,35 +66,37 @@ namespace model_fitting
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
-//! Short description of tRansacLeastSquaresPolynomial
-/*! A more detailed description of tRansacLeastSquaresPolynomial, which
-    Tobias Foehst hasn't done yet !!
-*/
-template <size_t Tdegree>
-class tRansacLeastSquaresPolynomial : public tLeastSquaresPolynomial<Tdegree>,
-    public tRansacModel<typename tLeastSquaresPolynomial<Tdegree>::tSample>
+//! Short description of tCondensation
+/*!
+ */
+template <typename TConfiguration>
+class tCondensation
 {
-
-  typedef model_fitting::tRansacModel<typename tLeastSquaresPolynomial<Tdegree>::tSample> tRansacModel;
-  typedef model_fitting::tLeastSquaresPolynomial<Tdegree> tLeastSquaresPolynomial;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
-  typedef typename tLeastSquaresPolynomial::tSample tSample;
-
-  tRansacLeastSquaresPolynomial(bool local_optimization = false);
-
-  template <typename TIterator>
-  tRansacLeastSquaresPolynomial(TIterator begin, TIterator end,
-                                unsigned int max_iterations = 50, double satisfactory_support_ratio = 1.0, double max_error = 1E-6,
-                                bool local_optimization = false);
-
-  const size_t MinimalSetSize() const
+  typedef TConfiguration tConfiguration;
+  struct tParticle
   {
-    return Tdegree + 1;
+    tConfiguration configuration;
+    float score;
+  };
+
+  tCondensation();
+
+  virtual ~tCondensation() = 0;
+
+  void Initialize(unsigned int number_of_particles,
+                  const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance);
+
+  const bool PerformUpdate();
+
+  inline const std::vector<tParticle> &GetParticles() const
+  {
+    return this->particles;
   }
 
 //----------------------------------------------------------------------
@@ -101,14 +104,20 @@ public:
 //----------------------------------------------------------------------
 private:
 
+  unsigned int number_of_particles;
+  std::vector<tParticle> particles;
+
+  CvConDensation *condensation;
+  CvRNG random_number_generator;
+
   virtual const char *GetLogDescription() const
   {
-    return "tRansacLeastSquaresPolynomial";
+    return "tCondensation";
   }
 
-  virtual const bool FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set);
-  virtual const bool FitToSampleIndexSet(const std::vector<size_t> &sample_index_set);
-  virtual const double GetSampleError(const tSample &sample) const;
+  void UpdateParticles();
+
+  virtual float CalculateConfigurationScore(const tConfiguration &configuration) const = 0;
 
 };
 
@@ -118,6 +127,6 @@ private:
 }
 }
 
-#include "rrlib/model_fitting/tRansacLeastSquaresPolynomial.hpp"
+#include "rrlib/model_fitting/tCondensation.hpp"
 
 #endif

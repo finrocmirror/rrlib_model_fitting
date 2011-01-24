@@ -177,7 +177,7 @@ int main(int argc, char **argv)
   std::cout << "=== Ransac least squares polynomial of degree 1 ===" << std::endl;
   {
     const size_t cDEGREE = 1;
-    tRansacLeastSquaresPolynomial<cDEGREE> curve(data, max_iterations, satisfactory_support_ratio, max_error);
+    tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
     window.Clear();
     for (size_t i = 0; i < curve.GetSamples().size(); ++i)
     {
@@ -192,7 +192,7 @@ int main(int argc, char **argv)
   std::cout << "=== Ransac least squares polynomial of degree 2 ===" << std::endl;
   {
     const size_t cDEGREE = 2;
-    tRansacLeastSquaresPolynomial<cDEGREE> curve(data, max_iterations, satisfactory_support_ratio, max_error);
+    tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
     window.Clear();
     for (size_t i = 0; i < curve.GetSamples().size(); ++i)
     {
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
   std::cout << "=== Ransac least squares polynomial of degree 3 (50 rounds) ===" << std::endl;
   {
     const size_t cDEGREE = 3;
-    tRansacLeastSquaresPolynomial<cDEGREE> curve(data, max_iterations, satisfactory_support_ratio, max_error);
+    tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
     for (size_t i = 0; i < curve.GetSamples().size(); ++i)
     {
       window.SetColor(curve.GetAssignments()[i] ? cDEGREE : 0);
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
   std::cout << "=== Ransac least squares polynomial of degree 4 ===" << std::endl;
   {
     const size_t cDEGREE = 4;
-    tRansacLeastSquaresPolynomial<cDEGREE> curve(data, max_iterations, satisfactory_support_ratio, max_error);
+    tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
     window.Clear();
     for (size_t i = 0; i < curve.GetSamples().size(); ++i)
     {

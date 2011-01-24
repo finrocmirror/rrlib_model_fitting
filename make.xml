@@ -4,9 +4,7 @@
   <rrlib name="model_fitting">
     <sources>
       definitions.h
-<!--
       tCondensation.h
--->
       tLeastSquaresPolynomial.h
       tRansacModel.h
       tRansacLeastSquaresPolynomial.h
@@ -20,12 +18,10 @@
     </sources>
   </testprogram>
 
-<!--
   <testprogram name="condensation">
     <sources>
       test/test_condensation.cpp
     </sources>
   </testprogram>
--->
 
 </targets>
