@@ -35,15 +35,15 @@
 #include <cstdlib>
 #include <algorithm>
 
-//----------------------------------------------------------------------
-// Internal includes with ""
-//----------------------------------------------------------------------
 #include "rrlib/math/tMatrix.h"
 #include "rrlib/math/tLUDecomposition.h"
 #include "rrlib/math/tCholeskyDecomposition.h"
 
 #include "rrlib/util/stl_container/join.h"
 
+//----------------------------------------------------------------------
+// Internal includes with ""
+//----------------------------------------------------------------------
 #include "rrlib/model_fitting/definitions.h"
 
 //----------------------------------------------------------------------

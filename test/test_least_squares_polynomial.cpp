@@ -35,11 +35,11 @@
 #include <iostream>
 #include <vector>
 
+#include "rrlib/highgui_wrapper/tWindow.h"
+
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "rrlib/highgui_wrapper/tWindow.h"
-
 #include "rrlib/model_fitting/tLeastSquaresPolynomial.h"
 #include "rrlib/model_fitting/tRansacLeastSquaresPolynomial.h"
 

@@ -35,12 +35,13 @@
 #include <iostream>
 #include <vector>
 
+#include "rrlib/highgui_wrapper/tWindow.h"
+
+#include "rrlib/math/tVector.h"
+
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "rrlib/highgui_wrapper/tWindow.h"
-#include "rrlib/math/tVector.h"
-
 #include "rrlib/model_fitting/tCondensation.h"
 
 //----------------------------------------------------------------------

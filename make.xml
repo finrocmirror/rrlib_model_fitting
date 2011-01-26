@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <targets>
 
-  <rrlib name="model_fitting">
+  <rrlib name="model_fitting"
+        libs="opencv_core">
     <sources>
       definitions.h
       tCondensation.h
