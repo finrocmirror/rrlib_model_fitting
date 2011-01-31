@@ -34,8 +34,8 @@
  *
  */
 //----------------------------------------------------------------------
-#ifndef _rrlib_model_fitting_tRansacPlane3D_h_
-#define _rrlib_model_fitting_tRansacPlane3D_h_
+#ifndef __rrlib__model_fitting__tRansacPlane3D_h__
+#define __rrlib__model_fitting__tRansacPlane3D_h__
 
 #include "rrlib/geometry/tPlane.h"
 #include "rrlib/model_fitting/tRansacModel.h"

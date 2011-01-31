@@ -184,7 +184,7 @@ void tRansacPlane3D::ClearPointConstraint()
 }
 
 //----------------------------------------------------------------------
-// tRansacPlane3D FitToMinimalSampleSet
+// tRansacPlane3D FitToMinimalSampleIndexSet
 //----------------------------------------------------------------------
 const bool tRansacPlane3D::FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set)
 {
@@ -232,7 +232,7 @@ const bool tRansacPlane3D::FitToMinimalSampleIndexSet(const std::vector<size_t> 
 }
 
 //----------------------------------------------------------------------
-// tRansacPlane3D FitToSampleSet
+// tRansacPlane3D FitToSampleIndexSet
 //----------------------------------------------------------------------
 const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample_index_set)
 {

@@ -90,7 +90,7 @@ tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(TIterator 
 }
 
 //----------------------------------------------------------------------
-// tRansacLeastSquaresPolynomial FitToMinimalSampleSet
+// tRansacLeastSquaresPolynomial FitToMinimalSampleIndexSet
 //----------------------------------------------------------------------
 template <size_t Tdegree>
 const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set)
@@ -98,9 +98,10 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToMinimalSampleIndexSet(co
   // ensure distinct points
   for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
   {
-    for (std::vector<size_t>::const_iterator kt = it; kt != sample_index_set.end(); ++kt)
+    std::vector<size_t>::const_iterator kt = it;
+    for (++kt; kt != sample_index_set.end(); ++kt)
     {
-      if ((this->GetSamples()[*it] - this->GetSamples()[*kt]).IsZero())
+      if (IsEqual(this->GetSamples()[*it], this->GetSamples()[*kt]))
       {
         return false;
       }
@@ -110,7 +111,7 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToMinimalSampleIndexSet(co
 }
 
 //----------------------------------------------------------------------
-// tRansacLeastSquaresPolynomial FitToSampleSet
+// tRansacLeastSquaresPolynomial FitToSampleIndexSet
 //----------------------------------------------------------------------
 template <size_t Tdegree>
 const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToSampleIndexSet(const std::vector<size_t> &sample_index_set)

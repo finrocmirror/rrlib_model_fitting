@@ -34,8 +34,8 @@
  *
  */
 //----------------------------------------------------------------------
-#ifndef _rrlib_model_fitting_tRansacModel_h_
-#define _rrlib_model_fitting_tRansacModel_h_
+#ifndef __rrlib__model_fitting__tRansacModel_h__
+#define __rrlib__model_fitting__tRansacModel_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")

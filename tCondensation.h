@@ -33,8 +33,8 @@
  *
  */
 //----------------------------------------------------------------------
-#ifndef _rrlib_model_fitting_tCondensation_h_
-#define _rrlib_model_fitting_tCondensation_h_
+#ifndef __rrlib__model_fitting__tCondensation_h__
+#define __rrlib__model_fitting__tCondensation_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")

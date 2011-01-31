@@ -33,8 +33,8 @@
  *
  */
 //----------------------------------------------------------------------
-#ifndef _rrlib_model_fitting_tRansacLeastSquaresPolynomial_h_
-#define _rrlib_model_fitting_tRansacLeastSquaresPolynomial_h_
+#ifndef __rrlib__model_fitting__tRansacLeastSquaresPolynomial_h__
+#define __rrlib__model_fitting__tRansacLeastSquaresPolynomial_h__
 
 #include "rrlib/model_fitting/tLeastSquaresPolynomial.h"
 #include "rrlib/model_fitting/tRansacModel.h"
