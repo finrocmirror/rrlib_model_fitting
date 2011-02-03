@@ -149,6 +149,8 @@ private:
     return "tRansacPlane3D";
   }
 
+  const bool CheckConstraints() const;
+
   virtual const bool FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set);
   virtual const bool FitToSampleIndexSet(const std::vector<size_t> &sample_index_set);
   virtual const double GetSampleError(const tSample &sample) const;

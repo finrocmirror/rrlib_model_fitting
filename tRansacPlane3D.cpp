@@ -152,7 +152,7 @@ tRansacPlane3D::tRansacPlane3D(TIterator begin, TIterator end,
 void tRansacPlane3D::SetNormalConstraint(const math::tVec3d &direction, math::tAngleRadUnsigned max_angle_distance)
 {
   this->normal_constraint.active = true;
-  this->normal_constraint.direction = direction;
+  this->normal_constraint.direction = direction.Normalized();
   this->normal_constraint.max_angle_distance = max_angle_distance;
 }
 
@@ -202,30 +202,19 @@ const bool tRansacPlane3D::FitToMinimalSampleIndexSet(const std::vector<size_t> 
     return false;
   }
 
-  // ensure that chosen points are not colinear
-  if (p1_p2 * p1_p3 > 0.999)
-  {
-    return false;
-  }
+  // ensure that chosen points are not colinear // FIXME: re-think this condition
+//  if (p1_p2 * p1_p3 > 0.999)
+//  {
+//    return false;
+//  }
 
   this->Set(p1, p2, p3);
 
-  // check constraints
-  if (this->normal_constraint.active)
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Checking constraints");
+  if (!this->CheckConstraints())
   {
-    if (std::acos(this->Normal() * this->normal_constraint.direction) > this->normal_constraint.max_angle_distance)
-    {
-      return false;
-    }
-  }
-
-  if (this->point_constraint.active)
-  {
-    double distance = this->GetDistanceToPoint(this->point_constraint.reference_point);
-    if (distance < this->point_constraint.min_distance || distance > this->point_constraint.max_distance)
-    {
-      return false;
-    }
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Constraints violated!");
+    return false;
   }
 
   return true;
@@ -264,13 +253,16 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
   CvMat cv_u = cvMat(3, 3, CV_64FC1, u);
   cvSVD(&cv_covariance, &cv_s, &cv_u, 0, CV_SVD_MODIFY_A | CV_SVD_U_T);
 
-  if (math::IsEqual(s[8], 0))
+  // use weakest component as plane normal
+  this->Set(center_of_gravity, math::tVec3d(u[6], u[7], u[8]));
+
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Checking constraints");
+  if (!this->CheckConstraints())
   {
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Constraints violated!");
     return false;
   }
 
-  // use weakest component as plane normal
-  this->Set(center_of_gravity, math::tVec3d(u[6], u[7], u[8]));
   return true;
 }
 
@@ -280,4 +272,36 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
 const double tRansacPlane3D::GetSampleError(const tSample &sample) const
 {
   return this->GetDistanceToPoint(sample);
+}
+
+//----------------------------------------------------------------------
+// tRansacPlane3D CheckConstraints
+//----------------------------------------------------------------------
+const bool tRansacPlane3D::CheckConstraints() const
+{
+  if (this->normal_constraint.active)
+  {
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Checking normal constraint:");
+
+    if (EnclosedAngle(this->Normal(), this->normal_constraint.direction) > this->normal_constraint.max_angle_distance)
+    {
+      RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Failed!");
+      return false;
+    }
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "OK.");
+  }
+
+  if (this->point_constraint.active)
+  {
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Checking point constraint:");
+
+    double distance = this->GetDistanceToPoint(this->point_constraint.reference_point);
+    if (distance < this->point_constraint.min_distance || distance > this->point_constraint.max_distance)
+    {
+      RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Failed!");
+      return false;
+    }
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "OK.");
+  }
+  return true;
 }
