@@ -254,7 +254,10 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
   cvSVD(&cv_covariance, &cv_s, &cv_u, 0, CV_SVD_MODIFY_A | CV_SVD_U_T);
 
   // use weakest component as plane normal
-  this->Set(center_of_gravity, math::tVec3d(u[6], u[7], u[8]));
+  math::tVec3d normal(u[6], u[7], u[8]);
+
+  // the current normal was checked against the constraints. maybe the normal from the SVD changed its direction
+  this->Set(center_of_gravity, normal * this->Normal() < 0 ? -normal : normal);
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Checking constraints");
   if (!this->CheckConstraints())
