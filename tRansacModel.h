@@ -99,16 +99,31 @@ public:
     this->local_optimization = enabled;
   }
 
-  const bool DoRANSAC(unsigned int max_iterations, double satisfactory_support_ratio = 1.0, double max_error = 1E-6);
+  const bool DoRANSAC(unsigned int max_iterations, double satisfactory_inlier_ratio = 1.0, double max_error = 1E-6);
 
-  inline const std::vector<tSample> &GetSamples() const
+  inline const std::vector<tSample> &Samples() const
   {
     return this->samples;
   }
 
-  inline const std::vector<bool> &GetAssignments() const
+  inline const std::vector<bool> &Assignments() const
   {
     return this->assignments;
+  }
+
+  inline const double NumberOfInliers() const
+  {
+    return this->number_of_inliers;
+  }
+
+  inline const double InlierRatio() const
+  {
+    return this->inlier_ratio;
+  }
+
+  inline const double Error() const
+  {
+    return this->error;
   }
 
   virtual const size_t MinimalSetSize() const = 0;
@@ -121,6 +136,9 @@ private:
   bool local_optimization;
   std::vector<tSample> samples;
   std::vector<bool> assignments;
+  size_t number_of_inliers;
+  bool inlier_ratio;
+  bool error;
 
   virtual const char *GetLogDescription() const
   {

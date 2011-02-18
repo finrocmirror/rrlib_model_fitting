@@ -179,10 +179,10 @@ int main(int argc, char **argv)
     const size_t cDEGREE = 1;
     tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
     window.Clear();
-    for (size_t i = 0; i < curve.GetSamples().size(); ++i)
+    for (size_t i = 0; i < curve.Samples().size(); ++i)
     {
-      window.SetColor(curve.GetAssignments()[i] ? cDEGREE : 0);
-      window.DrawCircleNormalized(curve.GetSamples()[i].X(), curve.GetSamples()[i].Y(), 0.005, true);
+      window.SetColor(curve.Assignments()[i] ? cDEGREE : 0);
+      window.DrawCircleNormalized(curve.Samples()[i].X(), curve.Samples()[i].Y(), 0.005, true);
     }
     window.SetColor(cDEGREE);
     DrawPolynomial(window, curve);
@@ -194,10 +194,10 @@ int main(int argc, char **argv)
     const size_t cDEGREE = 2;
     tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
     window.Clear();
-    for (size_t i = 0; i < curve.GetSamples().size(); ++i)
+    for (size_t i = 0; i < curve.Samples().size(); ++i)
     {
-      window.SetColor(curve.GetAssignments()[i] ? cDEGREE : 0);
-      window.DrawCircleNormalized(curve.GetSamples()[i].X(), curve.GetSamples()[i].Y(), 0.005, true);
+      window.SetColor(curve.Assignments()[i] ? cDEGREE : 0);
+      window.DrawCircleNormalized(curve.Samples()[i].X(), curve.Samples()[i].Y(), 0.005, true);
     }
     window.SetColor(cDEGREE);
     DrawPolynomial(window, curve);
@@ -208,10 +208,10 @@ int main(int argc, char **argv)
   {
     const size_t cDEGREE = 3;
     tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
-    for (size_t i = 0; i < curve.GetSamples().size(); ++i)
+    for (size_t i = 0; i < curve.Samples().size(); ++i)
     {
-      window.SetColor(curve.GetAssignments()[i] ? cDEGREE : 0);
-      window.DrawCircleNormalized(curve.GetSamples()[i].X(), curve.GetSamples()[i].Y(), 0.005, true);
+      window.SetColor(curve.Assignments()[i] ? cDEGREE : 0);
+      window.DrawCircleNormalized(curve.Samples()[i].X(), curve.Samples()[i].Y(), 0.005, true);
     }
     window.SetColor(cDEGREE);
     DrawPolynomial(window, curve);
@@ -223,10 +223,10 @@ int main(int argc, char **argv)
     const size_t cDEGREE = 4;
     tRansacLeastSquaresPolynomial<cDEGREE> curve(data.begin(), data.end(), max_iterations, satisfactory_support_ratio, max_error);
     window.Clear();
-    for (size_t i = 0; i < curve.GetSamples().size(); ++i)
+    for (size_t i = 0; i < curve.Samples().size(); ++i)
     {
-      window.SetColor(curve.GetAssignments()[i] ? cDEGREE : 0);
-      window.DrawCircleNormalized(curve.GetSamples()[i].X(), curve.GetSamples()[i].Y(), 0.005, true);
+      window.SetColor(curve.Assignments()[i] ? cDEGREE : 0);
+      window.DrawCircleNormalized(curve.Samples()[i].X(), curve.Samples()[i].Y(), 0.005, true);
     }
     window.SetColor(cDEGREE);
     DrawPolynomial(window, curve);

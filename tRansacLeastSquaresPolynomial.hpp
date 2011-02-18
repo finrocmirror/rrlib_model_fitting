@@ -101,7 +101,7 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToMinimalSampleIndexSet(co
     std::vector<size_t>::const_iterator kt = it;
     for (++kt; kt != sample_index_set.end(); ++kt)
     {
-      if (IsEqual(this->GetSamples()[*it], this->GetSamples()[*kt]))
+      if (IsEqual(this->Samples()[*it], this->Samples()[*kt]))
       {
         return false;
       }
@@ -120,7 +120,7 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToSampleIndexSet(const std
   chosen_samples.reserve(sample_index_set.size());
   for (typename std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
   {
-    chosen_samples.push_back(this->GetSamples()[*it]);
+    chosen_samples.push_back(this->Samples()[*it]);
   }
   this->UpdateModelFromSampleSet(chosen_samples);
   return true;

@@ -35,10 +35,6 @@
 #include <cstdlib>
 #include <algorithm>
 
-#include "rrlib/math/tMatrix.h"
-#include "rrlib/math/tLUDecomposition.h"
-#include "rrlib/math/tCholeskyDecomposition.h"
-
 #include "rrlib/util/stl_container/join.h"
 
 //----------------------------------------------------------------------
@@ -76,7 +72,9 @@ namespace model_fitting
 //----------------------------------------------------------------------
 template <typename TSample>
 tRansacModel<TSample>::tRansacModel(bool local_optimization)
-    : local_optimization(local_optimization)
+    : local_optimization(local_optimization),
+    inlier_ratio(0),
+    error(0)
 {}
 
 //----------------------------------------------------------------------
@@ -105,6 +103,8 @@ void tRansacModel<TSample>::Clear()
 {
   this->samples.clear();
   this->assignments.clear();
+  this->inlier_ratio = 0;
+  this->error = 0;
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Model cleared.");
 }
 
@@ -112,7 +112,7 @@ void tRansacModel<TSample>::Clear()
 // tRansacModel DoRANSAC
 //----------------------------------------------------------------------
 template <typename TSample>
-const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double satisfactory_support_ratio, double max_error)
+const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double satisfactory_inlier_ratio, double max_error)
 {
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Performing RANSAC algorithm.");
 
@@ -132,9 +132,9 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
   std::vector<size_t> best_consensus_index_set;
   best_consensus_index_set.reserve(this->samples.size());
 
-  size_t satisfactory_support = std::round(satisfactory_support_ratio * this->samples.size());
+  size_t satisfactory_support = std::round(satisfactory_inlier_ratio * this->samples.size());
   size_t max_support = 0;
-  double min_error = 0;
+  double min_error = std::numeric_limits<double>::max();
 
   // main RANSAC loop
   for (unsigned int iteration = 0; iteration < max_iterations; ++iteration)
@@ -219,6 +219,10 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
   {
     this->assignments[*it] = true;
   }
+
+  this->number_of_inliers = max_support;
+  this->inlier_ratio = static_cast<double>(max_support) / this->samples.size();
+  this->error = min_error;
 
   return true;
 }

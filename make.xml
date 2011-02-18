@@ -7,8 +7,8 @@
       definitions.h
       tCondensation.h
       tLeastSquaresPolynomial.h
-      tRansacModel.h
       tRansacLeastSquaresPolynomial.h
+      tRansacModel.h
       tRansacPlane3D.cpp
     </sources>
   </rrlib>

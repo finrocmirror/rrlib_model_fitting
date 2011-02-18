@@ -188,9 +188,9 @@ void tRansacPlane3D::ClearPointConstraint()
 //----------------------------------------------------------------------
 const bool tRansacPlane3D::FitToMinimalSampleIndexSet(const std::vector<size_t> &sample_index_set)
 {
-  const tSample &p1(this->GetSamples()[sample_index_set[0]]);
-  const tSample &p2(this->GetSamples()[sample_index_set[1]]);
-  const tSample &p3(this->GetSamples()[sample_index_set[2]]);
+  const tSample &p1(this->Samples()[sample_index_set[0]]);
+  const tSample &p2(this->Samples()[sample_index_set[1]]);
+  const tSample &p3(this->Samples()[sample_index_set[2]]);
 
   tSample p1_p2(p2 - p1);
   tSample p1_p3(p3 - p1);
@@ -229,7 +229,7 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
   tPoint center_of_gravity;
   for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
   {
-    center_of_gravity += this->GetSamples()[*it];
+    center_of_gravity += this->Samples()[*it];
   }
   center_of_gravity /= sample_index_set.size();
 
@@ -237,7 +237,7 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
   CvMat cv_covariance = cvMat(3, 3, CV_64FC1, covariance);
   for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
   {
-    tSample centered_point = this->GetSamples()[*it] - center_of_gravity;
+    tSample centered_point = this->Samples()[*it] - center_of_gravity;
 
     covariance[0] = centered_point.X() * centered_point.X();
     covariance[1] = covariance[3] = centered_point.X() * centered_point.Y();
