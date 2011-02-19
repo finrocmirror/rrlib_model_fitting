@@ -119,7 +119,6 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
   if (this->samples.size() < this->MinimalSetSize())
   {
     RRLIB_LOG_STREAM(logging::eLL_ERROR, "At least ", this->MinimalSetSize(), " samples must be added to construct model!");
-    this->Clear();
     return false;
   }
 
@@ -201,14 +200,12 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
   if (max_support == 0)
   {
     RRLIB_LOG_STREAM(logging::eLL_ERROR, "Failed to find a consensus set. Could not construct model.");
-    this->Clear();
     return false;
   }
 
   if (!this->FitToSampleIndexSet(best_consensus_index_set))
   {
     RRLIB_LOG_STREAM(logging::eLL_ERROR, "Failed to construct model from largest consensus set. Could not construct model.");
-    this->Clear();
     return false;
   }
 
