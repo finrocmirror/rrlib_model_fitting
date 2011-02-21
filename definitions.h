@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------
 namespace rrlib
 {
-namespace simvis3d
+namespace model_fitting
 {
 
 RRLIB_LOG_CREATE_DEFAULT_DOMAIN("model_fitting");
