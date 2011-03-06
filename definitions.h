@@ -33,8 +33,8 @@
  *
  */
 //----------------------------------------------------------------------
-#ifndef _rrlib_model_fitting_definitions_h_
-#define _rrlib_model_fitting_definitions_h_
+#ifndef __rrlib__model_fitting__definitions_h_
+#define __rrlib__model_fitting__definitions_h_
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")

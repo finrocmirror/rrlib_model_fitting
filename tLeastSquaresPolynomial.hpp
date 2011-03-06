@@ -122,8 +122,8 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(TIterator begin, TIter
    * S(xi^n*xi^0)   ...   S(xi^n*xi^n)   |   S(xi^n*yi)
    *
    */
-  rrlib::math::tMatrix < Tdegree + 1, Tdegree + 1, double, rrlib::math::matrix::Symmetrical > A;
-  rrlib::math::tVector < Tdegree + 1, double > b;
+  math::tMatrix < Tdegree + 1, Tdegree + 1, double, math::matrix::Symmetrical > A;
+  math::tVector < Tdegree + 1, double > b;
 
   for (TIterator it = begin; it != end; ++it)
   {
@@ -148,8 +148,8 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(TIterator begin, TIter
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Solving ", A, " x = ", b);
 
-  rrlib::math::tCholeskyDecomposition < Tdegree + 1 > cholesky_decomposition(A);
-  rrlib::math::tVector < Tdegree + 1 > solution = cholesky_decomposition.Solve(b);
+  math::tCholeskyDecomposition < Tdegree + 1 > cholesky_decomposition(A);
+  math::tVector < Tdegree + 1 > solution = cholesky_decomposition.Solve(b);
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "x = ", solution);
 
