@@ -25,4 +25,11 @@
     </sources>
   </testprogram>
 
+  <testprogram name="ransac_color_detection"
+        libs="opencv_all">
+    <sources>
+      test/test_ransac_color_detection.cpp
+    </sources>
+  </testprogram>
+
 </targets>

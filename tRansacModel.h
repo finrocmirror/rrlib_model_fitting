@@ -137,8 +137,8 @@ private:
   std::vector<tSample> samples;
   std::vector<bool> assignments;
   size_t number_of_inliers;
-  bool inlier_ratio;
-  bool error;
+  double inlier_ratio;
+  double error;
 
   virtual const char *GetLogDescription() const
   {
