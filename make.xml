@@ -9,6 +9,12 @@
       tLeastSquaresPolynomial.h
       tRansacLeastSquaresPolynomial.h
       tRansacModel.h
+    </sources>
+  </rrlib>
+
+  <rrlib name="model_fitting_ransac_plane_3d"
+        libs="opencv_core">
+    <sources>
       tRansacPlane3D.cpp
     </sources>
   </rrlib>

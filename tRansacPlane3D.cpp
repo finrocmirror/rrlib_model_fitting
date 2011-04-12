@@ -239,12 +239,12 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
   {
     tSample centered_point = this->Samples()[*it] - center_of_gravity;
 
-    covariance[0] = centered_point.X() * centered_point.X();
-    covariance[1] = covariance[3] = centered_point.X() * centered_point.Y();
-    covariance[2] = covariance[6] = centered_point.X() * centered_point.Z();
-    covariance[4] = centered_point.Y() * centered_point.Y();
-    covariance[5] = covariance[7] = centered_point.Y() * centered_point.Z();
-    covariance[8] = centered_point.Z() * centered_point.Z();
+    covariance[0] += centered_point.X() * centered_point.X();
+    covariance[1] = covariance[3] += centered_point.X() * centered_point.Y();
+    covariance[2] = covariance[6] += centered_point.X() * centered_point.Z();
+    covariance[4] += centered_point.Y() * centered_point.Y();
+    covariance[5] = covariance[7] += centered_point.Y() * centered_point.Z();
+    covariance[8] += centered_point.Z() * centered_point.Z();
   }
 
   double s[9];

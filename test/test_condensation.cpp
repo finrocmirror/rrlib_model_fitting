@@ -69,15 +69,21 @@ typedef tVec2d tConfiguration;
 // Implementation
 //----------------------------------------------------------------------
 
-tConfiguration ground_truth;
+std::vector<tConfiguration> ground_truth;
 
 class tPointFinder : public tCondensation<tConfiguration>
 {
 private:
 
-  float CalculateConfigurationScore(const tConfiguration &configuration) const
+  double CalculateConfigurationScore(const tConfiguration &configuration) const
   {
-    return 1.0 / (configuration - ground_truth).Length();
+    assert(ground_truth.size() > 0);
+    double max_score = 0;
+    for (std::vector<tConfiguration>::const_iterator it = ground_truth.begin(); it != ground_truth.end(); ++it)
+    {
+      max_score = std::max(max_score, 1.0 / (configuration - *it).Length());
+    }
+    return max_score;
   }
 };
 
@@ -86,24 +92,23 @@ int main(int argc, char **argv)
   rrlib::logging::default_log_description = basename(argv[0]);
 
   rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainConfiguresSubTree(".", true);
-  rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_3);
+  rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_1);
   rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainPrintsLocation(".", false);
 
   tWindow &window = tWindow::GetInstance("Condensation Tests", 500, 500);
 
-  ground_truth.Set(0.5, 0.5);
-
-  window.SetColor(0);
-  window.DrawCircleNormalized(ground_truth.X(), ground_truth.Y(), 0.01, true);
-  window.Render();
+  ground_truth.resize(1);
+  ground_truth[0].Set(0.5, 0.75);
 
   tPointFinder point_finder;
-
   point_finder.Initialize(50, tConfiguration::Zero(), tConfiguration(1, 1), tConfiguration(0.01, 0.01));
 
   window.Clear();
   window.SetColor(0);
-  window.DrawCircleNormalized(ground_truth.X(), ground_truth.Y(), 0.01, true);
+  for (std::vector<tConfiguration>::const_iterator it = ground_truth.begin(); it != ground_truth.end(); ++it)
+  {
+    window.DrawCircleNormalized(it->X(), it->Y(), 0.01, true);
+  }
   window.SetColor(1);
   for (std::vector<tPointFinder::tParticle>::const_iterator it = point_finder.GetParticles().begin(); it != point_finder.GetParticles().end(); ++it)
   {
@@ -111,13 +116,45 @@ int main(int argc, char **argv)
   }
   window.Render();
 
-  for (unsigned int i = 0; i < 10; ++i)
+  for (unsigned int i = 1; i < 400; ++i)
   {
+    double x_offset = 0.25 * std::sin(i / (20 * M_PI));
+    double y_offset = 0.25 * std::cos(i / (20 * M_PI));
+    ground_truth[0].Set(0.5 + x_offset, 0.5 + y_offset);
+
     point_finder.PerformUpdate();
 
     window.Clear();
     window.SetColor(0);
-    window.DrawCircleNormalized(ground_truth.X(), ground_truth.Y(), 0.01, true);
+    for (std::vector<tConfiguration>::const_iterator it = ground_truth.begin(); it != ground_truth.end(); ++it)
+    {
+      window.DrawCircleNormalized(it->X(), it->Y(), 0.01, true);
+    }
+    window.SetColor(1);
+    for (std::vector<tPointFinder::tParticle>::const_iterator it = point_finder.GetParticles().begin(); it != point_finder.GetParticles().end(); ++it)
+    {
+      window.DrawCircleNormalized(it->configuration.X(), it->configuration.Y(), 0.005, true);
+    }
+    window.Render();
+  }
+
+  ground_truth.resize(2);
+
+  for (unsigned int i = 0; i < 800; ++i)
+  {
+    double x_offset = 0.25 * std::sin(i / (20 * M_PI));
+    double y_offset = 0.25 * std::cos(i / (20 * M_PI));
+    ground_truth[0].Set(0.5 + x_offset, 0.5 + y_offset);
+    ground_truth[1].Set(0.3 - x_offset, 0.3 + y_offset);
+
+    point_finder.PerformUpdate();
+
+    window.Clear();
+    window.SetColor(0);
+    for (std::vector<tConfiguration>::const_iterator it = ground_truth.begin(); it != ground_truth.end(); ++it)
+    {
+      window.DrawCircleNormalized(it->X(), it->Y(), 0.01, true);
+    }
     window.SetColor(1);
     for (std::vector<tPointFinder::tParticle>::const_iterator it = point_finder.GetParticles().begin(); it != point_finder.GetParticles().end(); ++it)
     {

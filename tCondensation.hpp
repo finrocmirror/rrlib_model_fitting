@@ -66,23 +66,18 @@ namespace model_fitting
 // tCondensation constructors
 //----------------------------------------------------------------------
 template <typename TConfiguration>
-tCondensation<TConfiguration>::tCondensation()
-    : number_of_particles(0),
-    condensation(0),
-    random_number_generator(cvRNG())
-{}
+tCondensation<TConfiguration>::tCondensation(long int seed)
+    : number_of_particles(0)
+{
+  srand48(seed);
+}
 
 //----------------------------------------------------------------------
 // tCondensation destructor
 //----------------------------------------------------------------------
 template <typename TConfiguration>
 tCondensation<TConfiguration>::~tCondensation()
-{
-  if (this->condensation)
-  {
-    cvReleaseConDensation(&this->condensation);
-  }
-}
+{}
 
 //----------------------------------------------------------------------
 // tCondensation Initialize
@@ -93,116 +88,95 @@ void tCondensation<TConfiguration>::Initialize(unsigned int number_of_particles,
 {
   assert(number_of_particles > 0);
   this->number_of_particles = number_of_particles;
+  this->lower_bound = lower_bound;
+  this->upper_bound = upper_bound;
+  this->variance = variance;
 
-  if (this->condensation)
+  this->particles.resize(this->number_of_particles);
+  for (size_t i = 0; i < this->number_of_particles; ++i)
   {
-    cvReleaseConDensation(&this->condensation);
-    this->condensation = NULL;
+    this->particles[i].configuration = SchurProduct(this->GenerateConfiguration(), this->upper_bound - this->lower_bound) + this->lower_bound;
+    this->particles[i].score = std::max(0.0, this->CalculateConfigurationScore(this->particles[i].configuration));
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Generated new particle with configuration ", this->particles[i].configuration, ".");
   }
-  assert(!this->condensation);
-  this->condensation = cvCreateConDensation(tConfiguration::cDIMENSION, tConfiguration::cDIMENSION, this->number_of_particles);
-  assert(this->condensation);
-
-  this->particles.reserve(this->number_of_particles);
-
-  float cv_lower_bound_buffer[tConfiguration::cDIMENSION];
-  float cv_upper_bound_buffer[tConfiguration::cDIMENSION];
-  CvMat cv_lower_bound = cvMat(tConfiguration::cDIMENSION, 1, CV_MAT32F, cv_lower_bound_buffer);
-  CvMat cv_upper_bound = cvMat(tConfiguration::cDIMENSION, 1, CV_MAT32F, cv_upper_bound_buffer);
-  for (size_t i = 0; i < tConfiguration::cDIMENSION; ++i)
-  {
-    cvmSet(&cv_lower_bound, i, 0, lower_bound[i]);
-    cvmSet(&cv_upper_bound, i, 0, upper_bound[i]);
-  }
-  cvConDensInitSampleSet(this->condensation, &cv_lower_bound, &cv_upper_bound);
-
-  assert(static_cast<size_t>(this->condensation->DP) == tConfiguration::cDIMENSION);
-  for (size_t i = 0; i < tConfiguration::cDIMENSION; ++i)
-  {
-    cvRandInit(&this->condensation->RandS[i], -variance[i], variance[i], i);
-  }
-
-  CvMat dynamic_matrix = cvMat(tConfiguration::cDIMENSION, tConfiguration::cDIMENSION, CV_MAT32F, this->condensation->DynamMatr);
-  cvmSetIdentity(&dynamic_matrix);
-
-  this->UpdateParticles();
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Initialized with ", this->number_of_particles, " particles.");
 }
 
 //----------------------------------------------------------------------
-// tCondensation UpdateParticles
+// tCondensation GenerateConfiguration
 //----------------------------------------------------------------------
 template <typename TConfiguration>
-void tCondensation<TConfiguration>::UpdateParticles()
+TConfiguration tCondensation<TConfiguration>::GenerateConfiguration() const
 {
-  this->particles.clear();
-  for (unsigned int i = 0; i < this->number_of_particles; ++i)
+  tConfiguration configuration;
+  for (size_t i = 0; i < tConfiguration::cDIMENSION; ++i)
   {
-    tParticle particle;
-    particle.configuration = tConfiguration(this->condensation->flSamples[i]);
-    particle.score = CalculateConfigurationScore(particle.configuration);
-
-    this->condensation->flConfidence[i] = std::max<float>(0.0, particle.score);
-
-    this->particles.push_back(particle);
+    configuration[i] = drand48();
   }
+  return configuration;
+}
+
+template <typename TConfiguration>
+TConfiguration tCondensation<TConfiguration>::GenerateConfiguration(const tConfiguration &center) const
+{
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Generating particle around ", center, " with variance ", this->variance, ".");
+  return center - this->variance + SchurProduct(this->GenerateConfiguration(), 2 * this->variance);
 }
 
 //----------------------------------------------------------------------
 // tCondensation PerformUpdate
 //----------------------------------------------------------------------
 template <typename TConfiguration>
-const bool tCondensation<TConfiguration>::PerformUpdate()
+void tCondensation<TConfiguration>::PerformUpdate()
 {
-  assert(this->condensation && static_cast<unsigned int>(this->condensation->SamplesNum) == this->number_of_particles);
+  std::sort(this->particles.begin(), this->particles.end(), tSortParticlesByScoreDecreasing());
 
-  cvConDensUpdateByTime(this->condensation);
+  double total_score = 0;
+  for (typename std::vector<tParticle>::iterator it = this->particles.begin(); it != this->particles.end(); ++it)
+  {
+    total_score += it->score;
+  }
+  for (typename std::vector<tParticle>::iterator it = this->particles.begin(); it != this->particles.end(); ++it)
+  {
+    it->score /= total_score;
+  }
 
-  this->UpdateParticles();
+  size_t resampling_size = 0.90 * this->number_of_particles;
 
-//  for (unsigned int i = 0; i < this->number_of_particles; ++i)
-//  {
-//    tParticle particle;
-//    for (size_t i = 0; i < tConfiguration::cDIMENSION; ++i)
-//    {
-//      particle.configuration = tConfiguration(this->condensation->flSamples[i]);
-//    }
+  std::vector<tConfiguration> new_configurations;
+  new_configurations.reserve(this->number_of_particles);
+  for (size_t i = 0; i < resampling_size; ++i)
+  {
+    size_t number_of_clones = this->number_of_particles * this->particles[i].score;
 
-//    // reinitialize if out of bounds
-//    if (my_model.IsAnwhereLowerThan(this->minimum_value_model) || my_model.IsAnwhereHigherThan(this->maximum_value_model))
-//    {
-//      ++reinited;
-//      ReinitSample(this->condensation->flSamples[i]);
-//      my_model.SetParametersFromArray(this->condensation->flSamples[i]);
-//    }
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Resampling ", number_of_clones, " particles from ", this->particles[i].configuration, " with score ", this->particles[i].score, ".");
 
-//    // update top n models
-//    if (top_n_models.size() < top_n)
-//    {
-//      // normalize model center
-//      my_model.NormalizeToCenterPosition(center_of_point_cloud_x, center_of_point_cloud_y);
-//
-//      top_n_models.insert(std::make_pair(model_score, tVector<5, float> (&my_model[0])));
-//    }
-//    else
-//    {
-//      // check if current model is better than worst of top n
-//      if (top_n_least_score < model_score)
-//      {
-//        // normalize model center
-//        my_model.NormalizeToCenterPosition(center_of_point_cloud_x, center_of_point_cloud_y);
-//
-//        // replace first model with lowest score
-//        top_n_models.erase(top_n_models.begin());
-//        top_n_models.insert(std::make_pair(model_score, tVector<5, float> (&my_model[0])));
-//        top_n_least_score = top_n_models.begin()->first;
-//      }
-//    }
+    if (resampling_size == 0 || new_configurations.size() + number_of_clones > resampling_size)
+    {
+      break;
+    }
+    for (size_t k = 0; k < number_of_clones; ++k)
+    {
+      new_configurations.push_back(this->GenerateConfiguration(this->particles[i].configuration));
+    }
+  }
 
-//  }
+  for (size_t i = 0; i < new_configurations.size(); ++i)
+  {
+    this->particles[i].configuration = new_configurations[i];
+    this->particles[i].score = std::max(0.0, this->CalculateConfigurationScore(this->particles[i].configuration));
+  }
 
-  return true;
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Resampled ", new_configurations.size(), " particles.");
+
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Generating ", this->number_of_particles - new_configurations.size(), " new particles.");
+
+  for (size_t i = new_configurations.size(); i < this->number_of_particles; ++i)
+  {
+    this->particles[i].configuration = SchurProduct(this->GenerateConfiguration(), this->upper_bound - this->lower_bound) + this->lower_bound;
+    this->particles[i].score = std::max(0.0, this->CalculateConfigurationScore(this->particles[i].configuration));
+  }
 }
 
 //----------------------------------------------------------------------

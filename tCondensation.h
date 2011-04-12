@@ -41,7 +41,7 @@
 //----------------------------------------------------------------------
 #include <vector>
 
-#include <cv.h>
+//#include <cv.h>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -79,20 +79,21 @@ class tCondensation
 public:
 
   typedef TConfiguration tConfiguration;
+
   struct tParticle
   {
     tConfiguration configuration;
-    float score;
+    double score;
   };
 
-  tCondensation();
+  tCondensation(long int seed = 0);
 
   virtual ~tCondensation() = 0;
 
   void Initialize(unsigned int number_of_particles,
                   const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance);
 
-  const bool PerformUpdate();
+  void PerformUpdate();
 
   inline const std::vector<tParticle> &GetParticles() const
   {
@@ -104,20 +105,33 @@ public:
 //----------------------------------------------------------------------
 private:
 
+  struct tSortParticlesByScoreDecreasing
+  {
+    const bool operator()(const tParticle &a, const tParticle &b) const
+    {
+      return a.score > b.score;
+    }
+  };
+
   unsigned int number_of_particles;
+  tConfiguration lower_bound;
+  tConfiguration upper_bound;
+  tConfiguration variance;
+
   std::vector<tParticle> particles;
 
-  CvConDensation *condensation;
-  CvRNG random_number_generator;
+//  CvConDensation *condensation;
+//  CvRNG random_number_generator;
 
   virtual const char *GetLogDescription() const
   {
     return "tCondensation";
   }
 
-  void UpdateParticles();
+  tConfiguration GenerateConfiguration() const;
+  tConfiguration GenerateConfiguration(const tConfiguration &center) const;
 
-  virtual float CalculateConfigurationScore(const tConfiguration &configuration) const = 0;
+  virtual double CalculateConfigurationScore(const tConfiguration &configuration) const = 0;
 
 };
 
