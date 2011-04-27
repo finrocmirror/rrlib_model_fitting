@@ -94,6 +94,15 @@ public:
     this->samples.push_back(sample);
   }
 
+  template <typename TIterator>
+  inline void AddSamples(TIterator begin, TIterator end)
+  {
+    for (TIterator it = begin; it != end; ++it)
+    {
+      this->samples.push_back(*it);
+    }
+  }
+
   inline void SetLocalOptimization(bool enabled)
   {
     this->local_optimization = enabled;
