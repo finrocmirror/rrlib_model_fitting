@@ -97,6 +97,7 @@ public:
   template <typename TIterator>
   inline void AddSamples(TIterator begin, TIterator end)
   {
+    this->samples.reserve(std::distance(begin, end));
     for (TIterator it = begin; it != end; ++it)
     {
       this->samples.push_back(*it);

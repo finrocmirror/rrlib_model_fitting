@@ -219,7 +219,7 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
 
   this->number_of_inliers = max_support;
   this->inlier_ratio = static_cast<double>(max_support) / this->samples.size();
-  this->error = min_error;
+  this->error = min_error / this->number_of_inliers;
 
   return true;
 }

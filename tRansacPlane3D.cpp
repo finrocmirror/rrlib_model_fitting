@@ -172,6 +172,7 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Center of gravity: ", center_of_gravity);
 
   double covariance[9];
+  std::memset(covariance, 0, sizeof(covariance));
   CvMat cv_covariance = cvMat(3, 3, CV_64FC1, covariance);
   for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
   {
