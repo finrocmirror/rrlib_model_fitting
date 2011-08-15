@@ -84,7 +84,7 @@ public:
 
   typedef typename tLeastSquaresPolynomial::tSample tSample;
 
-  tRansacLeastSquaresPolynomial(bool local_optimization = false);
+  explicit tRansacLeastSquaresPolynomial(bool local_optimization = false);
 
   template <typename TIterator>
   tRansacLeastSquaresPolynomial(TIterator begin, TIterator end,

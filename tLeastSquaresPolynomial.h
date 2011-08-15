@@ -89,9 +89,6 @@ public:
   template <typename TIterator>
   tLeastSquaresPolynomial(TIterator begin, TIterator end);
 
-  template <typename TSTLContainer>
-  explicit tLeastSquaresPolynomial(const TSTLContainer &samples);
-
   inline double GetStandardDeviation() const
   {
     return this->sigma;
@@ -99,9 +96,6 @@ public:
 
   template <typename TIterator>
   void UpdateModelFromSampleSet(TIterator begin, TIterator end);
-
-  template <typename TSTLContainer>
-  void UpdateModelFromSampleSet(const TSTLContainer &samples);
 
 //----------------------------------------------------------------------
 // Protected methods

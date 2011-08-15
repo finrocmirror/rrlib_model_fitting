@@ -83,7 +83,7 @@ public:
 
   typedef geometry::tPlane3D::tPoint tSample;
 
-  tRansacPlane3D(bool local_optimization = false);
+  explicit tRansacPlane3D(bool local_optimization = false);
 
   template <typename TIterator>
   tRansacPlane3D(TIterator begin, TIterator end,

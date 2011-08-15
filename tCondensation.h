@@ -86,7 +86,7 @@ public:
     double score;
   };
 
-  tCondensation(long int seed = 0);
+  explicit tCondensation(long int seed = 0);
 
   virtual ~tCondensation() = 0;
 

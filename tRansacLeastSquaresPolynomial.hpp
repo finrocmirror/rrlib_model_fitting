@@ -124,7 +124,7 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToSampleIndexSet(const std
   }
   try
   {
-    this->UpdateModelFromSampleSet(chosen_samples);
+    this->UpdateModelFromSampleSet(chosen_samples.begin(), chosen_samples.end());
   }
   catch (std::logic_error &exception)
   {

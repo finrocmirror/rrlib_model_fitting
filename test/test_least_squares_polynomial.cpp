@@ -144,25 +144,25 @@ int main(int argc, char **argv)
   std::cout << "=== Least squares polynomial of degree 1 ===" << std::endl;
 
   window.SetColor(1);
-  DrawPolynomial(window, tLeastSquaresPolynomial<1>(data));
+  DrawPolynomial(window, tLeastSquaresPolynomial<1>(data.begin(), data.end()));
   window.Render();
 
   std::cout << "=== Least squares polynomial of degree 2 ===" << std::endl;
 
   window.SetColor(2);
-  DrawPolynomial(window, tLeastSquaresPolynomial<2>(data));
+  DrawPolynomial(window, tLeastSquaresPolynomial<2>(data.begin(), data.end()));
   window.Render();
 
   std::cout << "=== Least squares polynomial of degree 3 ===" << std::endl;
 
   window.SetColor(3);
-  DrawPolynomial(window, tLeastSquaresPolynomial<3>(data));
+  DrawPolynomial(window, tLeastSquaresPolynomial<3>(data.begin(), data.end()));
   window.Render();
 
   std::cout << "=== Least squares polynomial of degree 4 ===" << std::endl;
 
   window.SetColor(4);
-  DrawPolynomial(window, tLeastSquaresPolynomial<4>(data));
+  DrawPolynomial(window, tLeastSquaresPolynomial<4>(data.begin(), data.end()));
   window.Render();
 
 

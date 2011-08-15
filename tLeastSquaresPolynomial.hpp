@@ -78,15 +78,7 @@ template <typename TIterator>
 tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial(TIterator begin, TIterator end)
     : sigma(0)
 {
-  this->UpdateModelFromSampleSet(begin, end);
-}
-
-template <size_t Tdegree>
-template <typename TSTLContainer>
-tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial(const TSTLContainer &samples)
-    : sigma(0)
-{
-  this->UpdateModelFromSampleSet(samples);
+  this->DoLinearRegression(begin, end);
 }
 
 //----------------------------------------------------------------------
@@ -97,13 +89,6 @@ template <typename TIterator>
 void tLeastSquaresPolynomial<Tdegree>::UpdateModelFromSampleSet(TIterator begin, TIterator end)
 {
   this->DoLinearRegression(begin, end);
-}
-
-template <size_t Tdegree>
-template <typename TSTLContainer>
-void tLeastSquaresPolynomial<Tdegree>::UpdateModelFromSampleSet(const TSTLContainer &samples)
-{
-  this->DoLinearRegression(samples.begin(), samples.end());
 }
 
 //----------------------------------------------------------------------

@@ -81,7 +81,7 @@ public:
 
   typedef TSample tSample;
 
-  tRansacModel(bool local_optimization = false);
+  explicit tRansacModel(bool local_optimization = false);
 
   virtual ~tRansacModel() = 0;
 
