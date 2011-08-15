@@ -36,6 +36,7 @@
 #include <vector>
 #include <cv.h>
 
+#include "rrlib/util/stl_container/join.h"
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
@@ -132,7 +133,17 @@ const bool tRansacPlane3D::FitToMinimalSampleIndexSet(const std::vector<size_t> 
 //    return false;
 //  }
 
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Using points: ", p1, ", ", p2, ", ", p3);
   this->Set(p1, p2, p3);
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Plane: (", this->Support(), ", ", this->Normal(), ")");
+
+  if (this->normal_constraint.active)
+  {
+    if (EnclosedAngle(this->Normal(), this->normal_constraint.direction) > math::tAngleRadUnsigned(math::tAngleDegUnsigned(90)))
+    {
+      this->Set(this->Support(), -this->Normal());
+    }
+  }
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Checking constraints");
   if (!this->CheckConstraints())
@@ -154,8 +165,11 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
   for (std::vector<size_t>::const_iterator it = sample_index_set.begin(); it != sample_index_set.end(); ++it)
   {
     center_of_gravity += this->Samples()[*it];
+    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Using sample ", this->Samples()[*it]);
   }
   center_of_gravity /= sample_index_set.size();
+
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Center of gravity: ", center_of_gravity);
 
   double covariance[9];
   CvMat cv_covariance = cvMat(3, 3, CV_64FC1, covariance);
@@ -171,6 +185,8 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
     covariance[8] += centered_point.Z() * centered_point.Z();
   }
 
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Covariance matrix: [ ", util::Join(covariance, covariance + 9, ", "), "]");
+
   double s[9];
   double u[9];
   CvMat cv_s = cvMat(3, 3, CV_64FC1, s);
@@ -182,6 +198,7 @@ const bool tRansacPlane3D::FitToSampleIndexSet(const std::vector<size_t> &sample
 
   // the current normal was checked against the constraints. maybe the normal from the SVD changed its direction
   this->Set(center_of_gravity, normal * this->Normal() < 0 ? -normal : normal);
+  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "After fitting: (", this->Support(), ", ", this->Normal(), ")");
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Checking constraints");
   if (!this->CheckConstraints())
