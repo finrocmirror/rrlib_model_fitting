@@ -112,7 +112,7 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(TIterator begin, TIter
 
   for (TIterator it = begin; it != end; ++it)
   {
-    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Considering sample ", *it);
+    RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Considering sample ", *it);
 
     double coefficient_components[2 * Tdegree + 1];
     coefficient_components[0] = 1;
@@ -131,12 +131,12 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(TIterator begin, TIter
     }
   }
 
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Solving ", A, " x = ", b);
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Solving ", A, " x = ", b);
 
   math::tCholeskyDecomposition < Tdegree + 1 > cholesky_decomposition(A);
   math::tVector < Tdegree + 1 > solution = cholesky_decomposition.Solve(b);
 
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "x = ", solution);
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "x = ", solution);
 
   for (size_t i = 0; i < Tdegree + 1; ++i)
   {
@@ -153,7 +153,7 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(TIterator begin, TIter
   }
   this->sigma = std::sqrt(this->sigma / (number_of_samples - 1));
 
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "sigma = ", this->sigma);
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "sigma = ", this->sigma);
 }
 
 //----------------------------------------------------------------------

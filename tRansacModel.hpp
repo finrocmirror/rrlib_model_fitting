@@ -92,7 +92,7 @@ void tRansacModel<TSample>::Initialize(unsigned int expected_number_of_samples)
 {
   this->Clear();
   this->samples.reserve(expected_number_of_samples);
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Initialized for ", expected_number_of_samples, " samples.");
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Initialized for ", expected_number_of_samples, " samples.");
 }
 
 //----------------------------------------------------------------------
@@ -105,7 +105,7 @@ void tRansacModel<TSample>::Clear()
   this->assignments.clear();
   this->inlier_ratio = 0;
   this->error = 0;
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Model cleared.");
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Model cleared.");
 }
 
 //----------------------------------------------------------------------
@@ -114,11 +114,11 @@ void tRansacModel<TSample>::Clear()
 template <typename TSample>
 const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double satisfactory_inlier_ratio, double max_error)
 {
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Performing RANSAC algorithm.");
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Performing RANSAC algorithm.");
 
   if (this->samples.size() < this->MinimalSetSize())
   {
-    RRLIB_LOG_STREAM(logging::eLL_ERROR, "At least ", this->MinimalSetSize(), " samples must be added to construct model!");
+    RRLIB_LOG_PRINT(logging::eLL_ERROR, "At least ", this->MinimalSetSize(), " samples must be added to construct model!");
     return false;
   }
 
@@ -138,17 +138,17 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
   // main RANSAC loop
   for (unsigned int iteration = 0; iteration < max_iterations; ++iteration)
   {
-    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Iteration: ", iteration);
+    RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Iteration: ", iteration);
 
     // generate indices for minimal random subset of all samples
     this->GenerateRandomIndexSet(minimal_index_set, this->MinimalSetSize(), this->samples.size() - 1);
 
-    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Random subset: ", util::Join(minimal_index_set, ", "));
+    RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Random subset: ", util::Join(minimal_index_set, ", "));
 
     // fit model to minimal sample set
     if (!this->FitToMinimalSampleIndexSet(minimal_index_set))
     {
-      RRLIB_LOG_STREAM(logging::eLL_DEBUG_WARNING, "Failed to construct model from minimal sample set. Skipping iteration.");
+      RRLIB_LOG_PRINT(logging::eLL_DEBUG_WARNING, "Failed to construct model from minimal sample set. Skipping iteration.");
       continue;
     }
 
@@ -158,7 +158,7 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
     // proceed if we found better support or lower error
     if (support > max_support || (support == max_support && total_error < min_error))
     {
-      RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Found better model with support ", support, " and total inlier error ", total_error);
+      RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Found better model with support ", support, " and total inlier error ", total_error);
 
       max_support = support;
       min_error = total_error;
@@ -168,7 +168,7 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
       {
         if (!this->FitToSampleIndexSet(best_consensus_index_set))
         {
-          RRLIB_LOG_STREAM(logging::eLL_DEBUG_WARNING, "Failed to optimize model locally. Continuing with unoptimized model.\n");
+          RRLIB_LOG_PRINT(logging::eLL_DEBUG_WARNING, "Failed to optimize model locally. Continuing with unoptimized model.\n");
         }
         else
         {
@@ -177,7 +177,7 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
 
           if (support > max_support || (support == max_support && total_error < min_error))
           {
-            RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Local Optimization yielded better model with support ", support, " and total inlier error ", total_error);
+            RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Local Optimization yielded better model with support ", support, " and total inlier error ", total_error);
 
             max_support = support;
             min_error = total_error;
@@ -189,7 +189,7 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
       // break if support requirements are already met
       if (max_support >= satisfactory_support)
       {
-        RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Reached satisfactory support ratio. Stopping iteration.");
+        RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Reached satisfactory support ratio. Stopping iteration.");
         break;
       }
     }
@@ -199,17 +199,17 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
   // see if we found a model
   if (max_support == 0)
   {
-    RRLIB_LOG_STREAM(logging::eLL_ERROR, "Failed to find a consensus set. Could not construct model.");
+    RRLIB_LOG_PRINT(logging::eLL_ERROR, "Failed to find a consensus set. Could not construct model.");
     return false;
   }
 
   if (!this->FitToSampleIndexSet(best_consensus_index_set))
   {
-    RRLIB_LOG_STREAM(logging::eLL_ERROR, "Failed to construct model from largest consensus set. Could not construct model.");
+    RRLIB_LOG_PRINT(logging::eLL_ERROR, "Failed to construct model from largest consensus set. Could not construct model.");
     return false;
   }
 
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_1, "Final model has been constructed from largest consensus set (size ", best_consensus_index_set.size(), " / ", this->samples.size(), ").");
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Final model has been constructed from largest consensus set (size ", best_consensus_index_set.size(), " / ", this->samples.size(), ").");
 
   this->assignments.resize(this->samples.size(), false);
   for (typename std::vector<size_t>::const_iterator it = best_consensus_index_set.begin(); it != best_consensus_index_set.end(); ++it)

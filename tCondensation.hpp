@@ -120,7 +120,7 @@ TConfiguration tCondensation<TConfiguration>::GenerateConfiguration() const
 template <typename TConfiguration>
 TConfiguration tCondensation<TConfiguration>::GenerateConfiguration(const tConfiguration &center) const
 {
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_3, "Generating particle around ", center, " with variance ", this->variance, ".");
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Generating particle around ", center, " with variance ", this->variance, ".");
   return center - this->variance + SchurProduct(this->GenerateConfiguration(), 2 * this->variance);
 }
 
@@ -150,7 +150,7 @@ void tCondensation<TConfiguration>::PerformUpdate()
   {
     size_t number_of_clones = this->number_of_particles * this->particles[i].score;
 
-    RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Resampling ", number_of_clones, " particles from ", this->particles[i].configuration, " with score ", this->particles[i].score, ".");
+    RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Resampling ", number_of_clones, " particles from ", this->particles[i].configuration, " with score ", this->particles[i].score, ".");
 
     if (resampling_size == 0 || new_configurations.size() + number_of_clones > resampling_size)
     {
@@ -168,7 +168,7 @@ void tCondensation<TConfiguration>::PerformUpdate()
     this->particles[i].score = std::max(0.0, this->CalculateConfigurationScore(this->particles[i].configuration));
   }
 
-  RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Resampled ", new_configurations.size(), " particles.");
+  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Resampled ", new_configurations.size(), " particles.");
 
   RRLIB_LOG_STREAM(logging::eLL_DEBUG_VERBOSE_2, "Generating ", this->number_of_particles - new_configurations.size(), " new particles.");
 
