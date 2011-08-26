@@ -19,29 +19,27 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    tCondensation.h
+/*!\file    tParticleFilter.h
  *
  * \author  Tobias Foehst
  *
  * \date    2011-01-19
  *
- * \brief   Contains tCondensation
+ * \brief   Contains tParticleFilter
  *
- * \b tCondensation
+ * \b tParticleFilter
  *
- * A few words for tCondensation
+ * A few words for tParticleFilter
  *
  */
 //----------------------------------------------------------------------
-#ifndef __rrlib__model_fitting__tCondensation_h__
-#define __rrlib__model_fitting__tCondensation_h__
+#ifndef __rrlib__model_fitting__tParticleFilter_h__
+#define __rrlib__model_fitting__tParticleFilter_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include <vector>
-
-//#include <cv.h>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -66,11 +64,11 @@ namespace model_fitting
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
-//! Short description of tCondensation
+//! Short description of tParticleFilter
 /*!
  */
 template <typename TConfiguration>
-class tCondensation
+class tParticleFilter
 {
 
 //----------------------------------------------------------------------
@@ -80,15 +78,32 @@ public:
 
   typedef TConfiguration tConfiguration;
 
-  struct tParticle
+  class tParticle
   {
+    friend class tParticleFilter<TConfiguration>;
+
     tConfiguration configuration;
     double score;
+
+    inline tParticle(const tConfiguration &configuration, double score)
+    : configuration(configuration), score(score)
+    {}
+
+  public:
+
+    inline const tConfiguration &Configuration() const
+    {
+      return this->configuration;
+    }
+    inline const double Score() const
+    {
+      return this->score;
+    }
   };
 
-  explicit tCondensation(long int seed = 0);
+  explicit tParticleFilter(long int seed = 0);
 
-  virtual ~tCondensation() = 0;
+  virtual ~tParticleFilter() = 0;
 
   void Initialize(unsigned int number_of_particles,
                   const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance);
@@ -109,7 +124,7 @@ private:
   {
     const bool operator()(const tParticle &a, const tParticle &b) const
     {
-      return a.score > b.score;
+      return a.Score() > b.Score();
     }
   };
 
@@ -120,18 +135,17 @@ private:
 
   std::vector<tParticle> particles;
 
-//  CvConDensation *condensation;
-//  CvRNG random_number_generator;
-
   virtual const char *GetLogDescription() const
   {
-    return "tCondensation";
+    return "tParticleFilter";
   }
 
   tConfiguration GenerateConfiguration() const;
   tConfiguration GenerateConfiguration(const tConfiguration &center) const;
 
-  virtual double CalculateConfigurationScore(const tConfiguration &configuration) const = 0;
+  inline double CalculateConfigurationScore(const tConfiguration &configuration) const;
+
+  virtual double CalculateConfigurationScoreImplementation(const tConfiguration &configuration) const = 0;
 
 };
 
@@ -141,6 +155,6 @@ private:
 }
 }
 
-#include "rrlib/model_fitting/tCondensation.hpp"
+#include "rrlib/model_fitting/tParticleFilter.hpp"
 
 #endif

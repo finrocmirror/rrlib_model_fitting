@@ -6,7 +6,7 @@
         libs="opencv_core">
     <sources>
       definitions.h
-      tCondensation.h
+      tParticleFilter.h
       tLeastSquaresPolynomial.h
       tRansacLeastSquaresPolynomial.h
       tRansacModel.h
@@ -26,9 +26,9 @@
     </sources>
   </testprogram>
 
-  <testprogram name="condensation">
+  <testprogram name="particle_filter">
     <sources>
-      test/test_condensation.cpp
+      test/test_particle_filter.cpp
     </sources>
   </testprogram>
 

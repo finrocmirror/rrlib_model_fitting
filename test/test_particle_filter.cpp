@@ -19,7 +19,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    test_condensation.cpp
+/*!\file    test_particle_filter.cpp
  *
  * \author  Tobias Foehst
  *
@@ -42,7 +42,7 @@
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "rrlib/model_fitting/tCondensation.h"
+#include "rrlib/model_fitting/tParticleFilter.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -71,11 +71,11 @@ typedef tVec2d tConfiguration;
 
 std::vector<tConfiguration> ground_truth;
 
-class tPointFinder : public tCondensation<tConfiguration>
+class tPointFinder : public tParticleFilter<tConfiguration>
 {
 private:
 
-  double CalculateConfigurationScore(const tConfiguration &configuration) const
+  double CalculateConfigurationScoreImplementation(const tConfiguration &configuration) const
   {
     assert(ground_truth.size() > 0);
     double max_score = 0;
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
   rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_1);
   rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainPrintsLocation(".", false);
 
-  tWindow &window = tWindow::GetInstance("Condensation Tests", 500, 500);
+  tWindow &window = tWindow::GetInstance("Particle Filter Tests", 500, 500);
 
   ground_truth.resize(1);
   ground_truth[0].Set(0.5, 0.75);
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
   window.SetColor(1);
   for (std::vector<tPointFinder::tParticle>::const_iterator it = point_finder.GetParticles().begin(); it != point_finder.GetParticles().end(); ++it)
   {
-    window.DrawCircleNormalized(it->configuration.X(), it->configuration.Y(), 0.005, true);
+    window.DrawCircleNormalized(it->Configuration().X(), it->Configuration().Y(), 0.005, true);
   }
   window.Render();
 
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     window.SetColor(1);
     for (std::vector<tPointFinder::tParticle>::const_iterator it = point_finder.GetParticles().begin(); it != point_finder.GetParticles().end(); ++it)
     {
-      window.DrawCircleNormalized(it->configuration.X(), it->configuration.Y(), 0.005, true);
+      window.DrawCircleNormalized(it->Configuration().X(), it->Configuration().Y(), 0.005, true);
     }
     window.Render();
   }
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
     window.SetColor(1);
     for (std::vector<tPointFinder::tParticle>::const_iterator it = point_finder.GetParticles().begin(); it != point_finder.GetParticles().end(); ++it)
     {
-      window.DrawCircleNormalized(it->configuration.X(), it->configuration.Y(), 0.005, true);
+      window.DrawCircleNormalized(it->Configuration().X(), it->Configuration().Y(), 0.005, true);
     }
     window.Render();
   }
