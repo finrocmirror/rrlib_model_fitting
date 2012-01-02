@@ -35,7 +35,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-#include "rrlib/util/stl_container/join.h"
+#include "rrlib/util/join.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
