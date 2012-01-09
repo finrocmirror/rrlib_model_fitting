@@ -2,9 +2,9 @@
 <!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://rrlib.org/xml/1.0/make.dtd">
 <targets>
 
-  <rrlib name="model_fitting"
-        libs="opencv_core">
+  <rrlib name="model_fitting">
     <sources>
+      cluster_analysis/*
       definitions.h
       tParticleFilter.h
       tLeastSquaresPolynomial.h
@@ -36,6 +36,12 @@
         libs="opencv_all">
     <sources>
       test/test_ransac_color_detection.cpp
+    </sources>
+  </testprogram>
+
+  <testprogram name="cluster_analysis">
+    <sources>
+      test/test_cluster_analysis.cpp
     </sources>
   </testprogram>
 
