@@ -40,6 +40,7 @@
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include <vector>
+#include <random>
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -101,7 +102,7 @@ public:
     }
   };
 
-  explicit tParticleFilter(long int seed = 0);
+  explicit tParticleFilter(long int seed = time(NULL));
 
   virtual ~tParticleFilter() = 0;
 
@@ -110,7 +111,7 @@ public:
 
   void PerformUpdate();
 
-  inline const std::vector<tParticle> &GetParticles() const
+  inline const std::vector<tParticle> &Particles() const
   {
     return this->particles;
   }
@@ -120,18 +121,12 @@ public:
 //----------------------------------------------------------------------
 private:
 
-  struct tSortParticlesByScoreDecreasing
-  {
-    const bool operator()(const tParticle &a, const tParticle &b) const
-    {
-      return a.Score() > b.Score();
-    }
-  };
-
   unsigned int number_of_particles;
   tConfiguration lower_bound;
   tConfiguration upper_bound;
   tConfiguration variance;
+
+  mutable std::mt19937 rng_engine;
 
   std::vector<tParticle> particles;
 
@@ -140,7 +135,6 @@ private:
     return "tParticleFilter";
   }
 
-  tConfiguration GenerateConfiguration() const;
   tConfiguration GenerateConfiguration(const tConfiguration &center) const;
 
   inline double CalculateConfigurationScore(const tConfiguration &configuration) const;

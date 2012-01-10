@@ -67,10 +67,9 @@ namespace model_fitting
 //----------------------------------------------------------------------
 template <typename TConfiguration>
 tParticleFilter<TConfiguration>::tParticleFilter(long int seed)
-    : number_of_particles(0)
-{
-  srand48(seed);
-}
+    : number_of_particles(0),
+    rng_engine(seed)
+{}
 
 //----------------------------------------------------------------------
 // tParticleFilter destructor
@@ -95,27 +94,17 @@ void tParticleFilter<TConfiguration>::Initialize(unsigned int number_of_particle
   this->particles.reserve(this->number_of_particles);
 }
 
-//----------------------------------------------------------------------
-// tParticleFilter GenerateConfiguration
-//----------------------------------------------------------------------
-template <typename TConfiguration>
-TConfiguration tParticleFilter<TConfiguration>::GenerateConfiguration() const
-{
-  tConfiguration configuration;
-  for (size_t i = 0; i < tConfiguration::cDIMENSION; ++i)
-  {
-    configuration[i] = drand48();
-  }
-  return configuration;
-}
-
 template <typename TConfiguration>
 TConfiguration tParticleFilter<TConfiguration>::GenerateConfiguration(const tConfiguration &center) const
 {
   RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Generating particle around ", center, " with variance ", this->variance, ".");
   while (true)
   {
-    tConfiguration configuration = center - this->variance + SchurProduct(this->GenerateConfiguration(), 2 * this->variance);
+    tConfiguration configuration;
+    for (size_t i = 0; i < tConfiguration::cDIMENSION; ++i)
+    {
+      configuration[i] = std::normal_distribution<typename tConfiguration::tElement>(center[i], std::sqrt(this->variance[i]))(this->rng_engine);
+    }
 
     bool accept = true;
     for (size_t i = 0; i < TConfiguration::cDIMENSION; ++i)
@@ -156,12 +145,19 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
   {
     for (size_t i = this->particles.size(); i < this->number_of_particles; ++i)
     {
-      tConfiguration configuration = SchurProduct(this->GenerateConfiguration(), this->upper_bound - this->lower_bound) + this->lower_bound;
+      tConfiguration configuration;
+      for (size_t k = 0; k < tConfiguration::cDIMENSION; ++k)
+      {
+        configuration[k] = std::uniform_real_distribution<typename tConfiguration::tElement>(this->lower_bound[k], this->upper_bound[k])(this->rng_engine);
+      }
       double score = this->CalculateConfigurationScore(configuration);
       this->particles.push_back(tParticle(configuration, score));
       RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Generated new particle with configuration ", this->particles.back().Configuration(), " and score ", this->particles.back().Score());
     }
-    std::sort(this->particles.begin(), this->particles.end(), tSortParticlesByScoreDecreasing());
+    std::sort(this->particles.begin(), this->particles.end(), [](const tParticle &a, const tParticle &b)
+    {
+      return a.Score() > b.Score();
+    });
   }
 
   double total_score = 0;
@@ -214,7 +210,10 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
   std::advance(new_end, new_configurations.size());
   this->particles.erase(new_end, this->particles.end());
 
-  std::sort(this->particles.begin(), this->particles.end(), tSortParticlesByScoreDecreasing());
+  std::sort(this->particles.begin(), this->particles.end(), [](const tParticle &a, const tParticle &b)
+  {
+    return a.Score() > b.Score();
+  });
 }
 
 //----------------------------------------------------------------------
