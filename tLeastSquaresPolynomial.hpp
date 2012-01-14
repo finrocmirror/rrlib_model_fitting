@@ -35,10 +35,11 @@
 #include "rrlib/math/tLUDecomposition.h"
 #include "rrlib/math/tCholeskyDecomposition.h"
 
+#include "rrlib/logging/messages.h"
+
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "rrlib/model_fitting/definitions.h"
 
 //----------------------------------------------------------------------
 // Debugging

@@ -5,7 +5,6 @@
   <rrlib name="model_fitting">
     <sources>
       cluster_analysis/*
-      definitions.h
       tParticleFilter.h
       tLeastSquaresPolynomial.h
       tRansacLeastSquaresPolynomial.h

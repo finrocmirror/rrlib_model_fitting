@@ -37,10 +37,12 @@
 #include <cv.h>
 
 #include "rrlib/util/join.h"
+
+#include "rrlib/logging/messages.h"
+
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "rrlib/model_fitting/definitions.h"
 
 //----------------------------------------------------------------------
 // Debugging

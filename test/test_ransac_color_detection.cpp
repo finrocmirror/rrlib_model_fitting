@@ -36,8 +36,8 @@
 #include <cv.h>
 #include <highgui.h>
 
-#include "rrlib/logging/definitions.h"
 #include "rrlib/math/tVector.h"
+#include "rrlib/logging/configuration.h"
 
 //----------------------------------------------------------------------
 // Internal includes with ""
@@ -130,9 +130,8 @@ int main(int argc, char **argv)
 {
   rrlib::logging::default_log_description = basename(argv[0]);
 
-  rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainConfiguresSubTree(".", true);
-  rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_3);
-  rrlib::logging::tLogDomainRegistry::GetInstance()->SetDomainPrintsLocation(".", false);
+  rrlib::logging::SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_3);
+  rrlib::logging::SetDomainPrintsLocation(".", false);
 
   IplImage *image = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);
   cvSet(image, cvScalar(128, 128, 128));
