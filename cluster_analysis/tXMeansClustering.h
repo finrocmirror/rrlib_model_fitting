@@ -19,36 +19,39 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 //----------------------------------------------------------------------
-/*!\file    tKMeansClustering.h
+/*!\file    tXMeansClustering.h
  *
  * \author  Tobias Foehst
  *
  * \date    2008-11-28
  *
- * \brief   Contains tKMeansClustering
+ * \brief   Contains tXMeansClustering
  *
- * \b tKMeansClustering
+ * \b tXMeansClustering
  *
- * The k-means clustering algorithm (H. Steinhaus, 1956), which groups
- * an given set of measurements into \e k clusters. This implementation
- * accelerates the classical approach by using a kd-tree and geometric
- * reasoning (D. Pelleg and A. Moore, 1999)
+ * The x-means clustering algorithm (D. Pelleg and A. Moore, 2000)
+ * determines the number and position of clusters of coordinates in a
+ * n-dimensional search space. In that way it extends the classical
+ * k-means algorithm, which required a known number of clusters and
+ * good initial positions of their centroids. It requires a fast
+ * implementation of k-means and starts with an initial assumption that
+ * it will find only one cluster. Then it generates recursively for
+ * every cluster two new centroids and estimates when the splitting
+ * stops yielding a better clustering.
  */
 //----------------------------------------------------------------------
-#ifndef __rrlib__model_fitting__cluster_analysis__tKMeansClustering_h__
-#define __rrlib__model_fitting__cluster_analysis__tKMeansClustering_h__
+#ifndef __rrlib__model_fitting__cluster_analysis__tXMeansClustering_h__
+#define __rrlib__model_fitting__cluster_analysis__tXMeansClustering_h__
 
 //----------------------------------------------------------------------
 // External includes (system with <>, local with "")
 //----------------------------------------------------------------------
 #include <vector>
 
-#include "rrlib/geometry/space_partitioning/tKDTree.h"
-
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
-#include "rrlib/model_fitting/cluster_analysis/tClustering.h"
+#include "rrlib/model_fitting/cluster_analysis/tCluster.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -69,9 +72,9 @@ namespace model_fitting
 //----------------------------------------------------------------------
 // Class declaration
 //----------------------------------------------------------------------
-//! The k-means algorithm
+//! The x-means algorithm (D. Pelleg and A. Moore, 2000)
 /*!
- * This class provides a generic implementation of the k-means clustering
+ * This class provides a generic implementation of the x-means clustering
  * algorithm. Therefore, it is a template that takes the following
  * parameters:
  *
@@ -84,16 +87,15 @@ namespace model_fitting
  * #include <iostream>
  * #include <iterator>
  * #include <vector>
- * #include "general/tKMeansClustering.h"
+ * #include "general/tXMeansClustering.h"
  *
- * typedef tKMeansClustering<2, float> tClustering;  // just use a typedef to instantiate the template
+ * typedef tXMeansClustering<2, float> tClustering;  // just use a typedef to instantiate the template
  *
  * // an own metric to show the generic capabilities of this class
  * // for simplicity it is recommended to use the provided typedef of the template-class, bearing in mind that tMeasurement is always an instantiation of rrlib::math::tVector
  * struct tManhattanNorm : public tClustering::tMetric
  * {
- *   inline const tClustering::tMetric::result_type operator() (const tClustering::tMetric::first_argument_type &x, const tClustering::tMetric::second_argument_type &y) const
- *   {
+ *   inline const tClustering::tMetric::result_type operator() (const tClustering::tMetric::first_argument_type &x, const tClustering::tMetric::second_argument_type &y) const {
  *     tClustering::tMetric::result_type result = 0;
  *     for (size_t i = 0; i < tClustering::tMeasurement::eDIMENSION; i++)
  *     {
@@ -108,10 +110,10 @@ namespace model_fitting
  *   std::vector<tClustering::tMeasurement> data;
  *   // ... fill data
  *
- *   // assuming 6 clusters the algorithm can be executed by
- *   tClustering clustering(6, data);                   // using the default (Euklidian) norm
- * //  tClustering clustering(6, data, tManhattanNorm()); // using an own defined norm
+ *   tClustering clustering(data.size(), data);                   // using the default (Euklidian) norm
+ * //  tClustering clustering(data.size(), data, tManhattanNorm()); // using an own defined norm
  *
+ *   std::cout << "Found " << clustering.GetNumberOfClusters() << " clusters:" << std::endl;
  *   for (size_t i = 0; i < clustering.GetNumberOfClusters(); i++)
  *   {
  *     std::cout << std::endl << "cluster " << i << " at " << clustering[i].Position() << ":" << std::endl;
@@ -122,11 +124,16 @@ namespace model_fitting
  *
  *   return EXIT_SUCCESS;
  * }
+ *
  * \endcode
  */
 template <typename TSample>
-class tKMeansClustering : public tClustering<TSample>
+class tXMeansClustering : public tClustering<TSample>
 {
+  /*!
+   * \brief An instantiation of tKMeansClustering that is used by this algorithm
+   */
+  typedef model_fitting::tKMeansClustering<TSample> tKMeansClustering;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -134,40 +141,16 @@ class tKMeansClustering : public tClustering<TSample>
 public:
 
   /*!
-   * \brief An instantiation of the tKDTree template that is used in this algorithm
-   */
-  typedef geometry::tKDTree<TSample::cDIMENSION, typename TSample::tElement> tKDTree;
-
-  /*!
-   * \brief The ctor of tKMeansClustering
+   * \brief The ctor of tXMeansClustering
    *
-   * \param k                           The number of clusters to arrange
-   * \param measurements                The measurements to process
-   * \param kd_tree                     A pre-computed kd-tree on the measurements that can be used
-   * \param initial_cluster_positions   A list of initial positions where clusters are expected
-   * \param epsilon                     The termination-criterion
+   * \param max_cluster    The upper bound for the number of clusters to arrange
+   * \param measurements   The measurements to process
+   * \param epsilon        The termination-criterion
    */
   template <typename TIterator>
-  tKMeansClustering(unsigned int k,
+  tXMeansClustering(unsigned int max_clusters,
                     TIterator samples_begin, TIterator samples_end,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
-
-  template <typename TIterator>
-  tKMeansClustering(unsigned int k,
-                    TIterator samples_begin, TIterator samples_end,
-                    const tKDTree &kd_tree,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
-
-  template <typename TIterator>
-  tKMeansClustering(TIterator samples_begin, TIterator samples_end,
-                    TIterator initial_positions_begin, TIterator initial_positions_end,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
-
-  template <typename TIterator>
-  tKMeansClustering(TIterator samples_begin, TIterator samples_end,
-                    TIterator initial_positions_begin, TIterator initial_positions_end,
-                    const tKDTree &kd_tree,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
+                    typename tXMeansClustering::tMetric metric = TSample::cEUCLIDEAN_DISTANCE);
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -175,42 +158,59 @@ public:
 private:
 
   /*!
-   * \brief Get the distance between a point and the hyper-rectangle of a kd-tree-node
-   *
-   * \param x        The point
-   * \param node     The node
-   * \param metric   The functor which computes an appropriate metric
-   *
-   * \return The distance from the point to the node
+   * \brief The internal data structure storing the clusters
    */
-  typename TSample::tElement DistanceToNode(const TSample &x, const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric) const;
+  class tClusterCandidate
+  {
 
-  /*!
-   * \brief Update the clusters from the given kd-tree node recursively
-   *
-   * \param node     The kd-tree node to process
-   * \param metric   The functor which computes an appropriate metric
-   */
-  void UpdateFromKDTreeNode(const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric);
+    //----------------------------------------------------------------------
+    // Public methods and typedefs
+    //----------------------------------------------------------------------
+  public:
+
+    tClusterCandidate(const typename tXMeansClustering::tCluster &cluster) : cluster(cluster), bvalue(0) {}
+
+    inline typename tXMeansClustering::tCluster &Cluster()
+    {
+      return this->cluster;
+    }
+
+    inline const std::vector<typename tXMeansClustering::tCluster> &Children() const
+    {
+      return this->children;
+    }
+
+    inline double BValue() const
+    {
+      return this->bvalue;
+    }
+
+    inline void Split(typename tXMeansClustering::tMetric metric);
+
+    //----------------------------------------------------------------------
+    // Private fields and methods
+    //----------------------------------------------------------------------
+  private:
+
+    typename tXMeansClustering::tCluster cluster;
+
+    std::vector<typename tXMeansClustering::tCluster> children;
+
+    double bvalue;
+
+    double ComputeBIC(const std::vector<typename tXMeansClustering::tCluster> &clusters) const;
+  };
 
   /*!
    * \brief Execute the algorithm
    *
+   * \param max_clusters                An upper limit for the numer of found clusters as termination criterion
    * \param measurements                The measurements to process
-   * \param kd_tree                     A precomputed kd-tree on the measurements that can be used
    * \param metric                      A functor which computes an appropriate metric
    * \param epsilon                     The termination-criterion
    */
   template <typename TIterator>
-  void Solve(TIterator samples_begin, TIterator samples_end, const tKDTree &kd_tree, const typename tKMeansClustering::tMetric &metric);
-
-  /*!
-   * \brief Generates cluster positions using a heuristic on the kd-tree
-   *
-   * \param node   The root of the subtree that should be used to generate \a n initial cluster positions
-   * \param n      The number of initial cluster positions that should be generated
-   */
-  void GenerateInitialClusterPositions(const typename tKDTree::tNode &node, size_t n);
+  void Solve(unsigned int max_clusters, TIterator samples_begin, TIterator samples_end, typename tXMeansClustering::tMetric metric);
 
 };
 
@@ -222,6 +222,6 @@ private:
 }
 
 
-#include "rrlib/model_fitting/cluster_analysis/tKMeansClustering.hpp"
+#include "rrlib/model_fitting/cluster_analysis/tXMeansClustering.hpp"
 
 #endif

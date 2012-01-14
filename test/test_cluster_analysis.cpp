@@ -45,8 +45,11 @@
 //----------------------------------------------------------------------
 #include "rrlib/geometry/tPoint.h"
 
-#define RRLIB_MODEL_FITTING_DEBUG_KMEANS
+//#define RRLIB_MODEL_FITTING_DEBUG_KMEANS
 #include "rrlib/model_fitting/cluster_analysis/tKMeansClustering.h"
+
+//#define RRLIB_MODEL_FITTING_DEBUG_XMEANS
+#include "rrlib/model_fitting/cluster_analysis/tXMeansClustering.h"
 
 //----------------------------------------------------------------------
 // Debugging
@@ -63,7 +66,9 @@ using namespace rrlib::highgui;
 //----------------------------------------------------------------------
 typedef double tElement;
 typedef rrlib::geometry::tPoint<2, tElement> tPoint;
-typedef rrlib::model_fitting::tKMeansClustering<tPoint> tClustering;
+typedef rrlib::model_fitting::tClustering<tPoint> tClustering;
+typedef rrlib::model_fitting::tKMeansClustering<tPoint> tKMeansClustering;
+typedef rrlib::model_fitting::tXMeansClustering<tPoint> tXMeansClustering;
 
 //----------------------------------------------------------------------
 // Const values
@@ -97,9 +102,10 @@ void DrawPoints(tWindow &window, const std::vector<tPoint> &points)
 
 void DrawClustering(tWindow &window, const tClustering &clustering)
 {
-  for (size_t i = 0; i < clustering.NumberOfClusters(); i++)
+  for (size_t i = 0; i < clustering.Clusters().size(); ++i)
   {
     window.SetColor(i);
+    DrawPoints(window, clustering.Clusters()[i].Samples());
     window.DrawCircleShifted(clustering.Clusters()[i].Center().X(), clustering.Clusters()[i].Center().Y(), 5, true);
   }
 }
@@ -181,7 +187,7 @@ void GenerateRandomClusteredPoints(std::vector<tPoint> &points, unsigned int &nu
 
 int main(int argc, char **argv)
 {
-  tWindow &window(tWindow::GetInstance("Test KD-Tree", cWINDOW_SIZE, cWINDOW_SIZE, -0.5 * cWINDOW_SIZE, -0.5 * cWINDOW_SIZE));
+  tWindow &window(tWindow::GetInstance("Test Cluster Analysis", cWINDOW_SIZE, cWINDOW_SIZE, -0.5 * cWINDOW_SIZE, -0.5 * cWINDOW_SIZE));
 
   std::vector<tPoint> points;
   unsigned int number_of_clusters;
@@ -192,11 +198,18 @@ int main(int argc, char **argv)
   DrawPoints(window, points);
   window.Render();
 
-  tClustering clustering(number_of_clusters, points.begin(), points.end());
+  tKMeansClustering k_means_clustering(number_of_clusters, points.begin(), points.end());
 
   window.Clear();
   DrawPoints(window, points);
-  DrawClustering(window, clustering);
+  DrawClustering(window, k_means_clustering);
+  window.Render();
+
+  tXMeansClustering x_means_clustering(2 * number_of_clusters, points.begin(), points.end());
+
+  window.Clear();
+  DrawPoints(window, points);
+  DrawClustering(window, x_means_clustering);
   window.Render();
 
   tWindow::ReleaseAllInstances();

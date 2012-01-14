@@ -60,8 +60,8 @@ namespace model_fitting
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-template <typename TSample>
-const typename tKMeansClustering<TSample>::tMetric tKMeansClustering<TSample>::cDEFAULT_METRIC = tKDTree::cDEFAULT_METRIC;
+//template <typename TSample>
+//const typename tKMeansClustering<TSample>::tMetric tKMeansClustering<TSample>::cDEFAULT_METRIC = tKDTree::cDEFAULT_METRIC;
 
 //----------------------------------------------------------------------
 // Implementation
@@ -74,7 +74,7 @@ template <typename TSample>
 template <typename TIterator>
 tKMeansClustering<TSample>::tKMeansClustering(unsigned int k,
     TIterator samples_begin, TIterator samples_end,
-    tMetric metric)
+    typename tKMeansClustering::tMetric metric)
 {
   assert(k > 0);
   assert(std::distance(samples_begin, samples_end) > 0);
@@ -90,13 +90,13 @@ template <typename TIterator>
 tKMeansClustering<TSample>::tKMeansClustering(unsigned int k,
     TIterator samples_begin, TIterator samples_end,
     const tKDTree &kd_tree,
-    tMetric metric)
+    typename tKMeansClustering::tMetric metric)
 {
   assert(k > 0);
   assert(std::distance(samples_begin, samples_end) > 0);
   this->clusters.reserve(k);
   this->GenerateInitialClusterPositions(kd_tree.Root(), k);
-  assert(this->clusters.size() == k);
+  assert(this->Clusters().size() == k);
   this->Solve(samples_begin, samples_end, kd_tree, metric);
 }
 
@@ -104,7 +104,7 @@ template <typename TSample>
 template <typename TIterator>
 tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator samples_end,
     TIterator initial_positions_begin, TIterator initial_positions_end,
-    tMetric metric)
+    typename tKMeansClustering::tMetric metric)
 {
   unsigned int k = std::distance(initial_positions_begin, initial_positions_end);
   assert(k > 0);
@@ -115,7 +115,7 @@ tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator
   {
     this->clusters.push_back(*it);
   }
-  assert(this->clusters.size() == k);
+  assert(this->Clusters().size() == k);
   this->Solve(samples_begin, samples_end, kd_tree, metric);
 }
 
@@ -124,7 +124,7 @@ template <typename TIterator>
 tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator samples_end,
     TIterator initial_positions_begin, TIterator initial_positions_end,
     const tKDTree &kd_tree,
-    tMetric metric)
+    typename tKMeansClustering::tMetric metric)
 {
   unsigned int k = std::distance(initial_positions_begin, initial_positions_end);
   assert(k > 0);
@@ -134,66 +134,15 @@ tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator
   {
     this->clusters.push_back(*it);
   }
-  assert(this->clusters.size() == k);
+  assert(this->Clusters().size() == k);
   this->Solve(samples_begin, samples_end, kd_tree, metric);
-}
-
-//----------------------------------------------------------------------
-// tKMeansClustering NumberOfClusters
-//----------------------------------------------------------------------
-template <typename TSample>
-size_t tKMeansClustering<TSample>::NumberOfClusters() const
-{
-  return this->clusters.size();
-}
-
-//----------------------------------------------------------------------
-// tKMeansClustering Clusters
-//----------------------------------------------------------------------
-template <typename TSample>
-const std::vector<typename tKMeansClustering<TSample>::tCluster> &tKMeansClustering<TSample>::Clusters() const
-{
-  return this->clusters;
-}
-
-//----------------------------------------------------------------------
-// tKMeansClustering Sort
-//----------------------------------------------------------------------
-template <typename TSample>
-void tKMeansClustering<TSample>::Sort()
-{
-  std::sort(this->clusters.begin(), this->clusters.end(), [this](const tCluster &a, const tCluster &b)
-  {
-    return a.Samples().size() > b.Samples().size();
-  });
-}
-
-//----------------------------------------------------------------------
-// tKMeansClustering GetNearestClusterID
-//----------------------------------------------------------------------
-template <typename TSample>
-size_t tKMeansClustering<TSample>::GetNearestClusterID(const TSample &sample, tMetric metric)
-{
-  auto nearest_cluster = this->clusters.end();
-  typename TSample::tElement min_distance = std::numeric_limits<typename TSample::tElement>::max();
-  for (auto cluster = this->clusters.begin(); cluster != this->clusters.end(); ++cluster)
-  {
-    typename TSample::tElement distance = metric(cluster->Center(), sample);
-    if (distance < min_distance)
-    {
-      min_distance = distance;
-      nearest_cluster = cluster;
-    }
-  }
-  assert(nearest_cluster != this->clusters.end());
-  return std::distance(this->clusters.begin(), nearest_cluster);
 }
 
 //----------------------------------------------------------------------
 // tKMeansClustering DistanceToNode
 //----------------------------------------------------------------------
 template <typename TSample>
-typename TSample::tElement tKMeansClustering<TSample>::DistanceToNode(const TSample &x, const typename tKDTree::tNode &node, tMetric metric) const
+typename TSample::tElement tKMeansClustering<TSample>::DistanceToNode(const TSample &x, const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric) const
 {
   // clip a copy of x to the hyper-rectangle ...
   TSample y(x);
@@ -209,7 +158,7 @@ typename TSample::tElement tKMeansClustering<TSample>::DistanceToNode(const TSam
 // tKMeansClustering UpdateFromKDTreeNode
 //----------------------------------------------------------------------
 template <typename TSample>
-void tKMeansClustering<TSample>::UpdateFromKDTreeNode(const typename tKDTree::tNode &node, tMetric metric)
+void tKMeansClustering<TSample>::UpdateFromKDTreeNode(const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric)
 {
   // special treatment for leaves
   if (node.IsLeaf())
@@ -261,7 +210,7 @@ void tKMeansClustering<TSample>::UpdateFromKDTreeNode(const typename tKDTree::tN
     if (dominating)
     {
 #ifdef RRLIB_MODEL_FITTING_DEBUG_KMEANS
-      rrlib::highgui::tWindow &debug_window(rrlib::highgui::tWindow::GetInstance("Debug k-means"));
+      highgui::tWindow &debug_window(highgui::tWindow::GetInstance("Debug k-means"));
       debug_window.SetColor(std::distance(this->clusters.begin(), owner_candidate));
       debug_window.DrawRectangleShifted(node.BoundingBox().Min().X(), node.BoundingBox().Min().Y(), node.BoundingBox().Max().X(), node.BoundingBox().Max().Y());
 #endif
@@ -281,14 +230,15 @@ void tKMeansClustering<TSample>::UpdateFromKDTreeNode(const typename tKDTree::tN
 //----------------------------------------------------------------------
 template <typename TSample>
 template <class TIterator>
-void tKMeansClustering<TSample>::Solve(TIterator samples_begin, TIterator samples_end, const tKDTree &kd_tree, const tMetric &metric)
+void tKMeansClustering<TSample>::Solve(TIterator samples_begin, TIterator samples_end, const tKDTree &kd_tree, const typename tKMeansClustering::tMetric &metric)
 {
 
 #ifdef RRLIB_MODEL_FITTING_DEBUG_KMEANS
   static_assert(TSample::cDIMENSION == 2, "Debugging of k-means is only supported for 2D samples");
-  rrlib::geometry::tBoundingBox<TSample::cDIMENSION, typename TSample::tElement> bounding_box(samples_begin, samples_end);
-  rrlib::highgui::tWindow &debug_window(rrlib::highgui::tWindow::GetInstance("Debug k-means", bounding_box.Max().X() - bounding_box.Min().X() + 1, bounding_box.Max().Y() - bounding_box.Min().Y() + 1,
-                                        bounding_box.Min().X(), bounding_box.Min().Y()));
+  geometry::tBoundingBox<TSample::cDIMENSION, typename TSample::tElement> bounding_box(samples_begin, samples_end);
+  highgui::tWindow &debug_window(highgui::tWindow::GetInstance("Debug k-means",
+                                 bounding_box.Max().X() - bounding_box.Min().X() + 1, bounding_box.Max().Y() - bounding_box.Min().Y() + 1,
+                                 bounding_box.Min().X(), bounding_box.Min().Y()));
 #endif
 
   bool done = false;
@@ -370,7 +320,7 @@ void tKMeansClustering<TSample>::GenerateInitialClusterPositions(const typename 
     // FIXME: Get random subset of size n from the node's points
     for (size_t i = 0; i < n; i++)
     {
-      this->clusters.push_back(tCluster(node.CenterOfMass()));
+      this->clusters.push_back(typename tKMeansClustering::tCluster(node.CenterOfMass()));
     }
   }
   else
