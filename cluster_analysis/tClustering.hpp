@@ -85,7 +85,7 @@ const std::vector<typename tClustering<TSample>::tCluster> &tClustering<TSample>
 template <typename TSample>
 void tClustering<TSample>::Sort()
 {
-  std::sort(this->clusters.begin(), this->clusters.end(), [this](const tCluster &a, const tCluster &b)
+  std::sort(this->clusters.begin(), this->clusters.end(), [this](const tCluster & a, const tCluster & b)
   {
     return a.Samples().size() > b.Samples().size();
   });

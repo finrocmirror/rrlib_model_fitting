@@ -71,13 +71,13 @@ namespace model_fitting
 //----------------------------------------------------------------------
 template <size_t Tdegree>
 tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial()
-    : sigma(0)
+  : sigma(0)
 {}
 
 template <size_t Tdegree>
 template <typename TIterator>
 tLeastSquaresPolynomial<Tdegree>::tLeastSquaresPolynomial(TIterator begin, TIterator end)
-    : sigma(0)
+  : sigma(0)
 {
   this->DoLinearRegression(begin, end);
 }

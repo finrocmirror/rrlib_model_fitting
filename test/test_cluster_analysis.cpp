@@ -141,7 +141,7 @@ void GenerateRandomClusteredPoints(std::vector<tPoint> &points, unsigned int &nu
     bool overlapping = false;
     for (auto it = clusters.begin(); it != clusters.end(); ++it)
     {
-      if ((it->center - center).Length() < 2 *(it->radius + radius))
+      if ((it->center - center).Length() < 2 * (it->radius + radius))
       {
         overlapping = true;
         break;

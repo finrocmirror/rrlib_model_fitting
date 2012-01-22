@@ -87,7 +87,7 @@ public:
     double score;
 
     inline tParticle(const tConfiguration &configuration, double score)
-        : configuration(configuration), score(score)
+      : configuration(configuration), score(score)
     {}
 
   public:

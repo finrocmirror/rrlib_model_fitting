@@ -67,7 +67,7 @@ namespace model_fitting
 //----------------------------------------------------------------------
 template <size_t Tdegree>
 tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(bool local_optimization)
-    : tRansacModel(local_optimization)
+  : tRansacModel(local_optimization)
 {}
 
 template <size_t Tdegree>
@@ -75,7 +75,7 @@ template <typename TIterator>
 tRansacLeastSquaresPolynomial<Tdegree>::tRansacLeastSquaresPolynomial(TIterator begin, TIterator end,
     unsigned int max_iterations, double satisfactory_support_ratio, double max_error,
     bool local_optimization)
-    : tRansacModel(local_optimization)
+  : tRansacModel(local_optimization)
 {
   this->Initialize(std::distance(begin, end));
   for (TIterator it = begin; it != end; ++it)

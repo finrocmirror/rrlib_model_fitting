@@ -66,7 +66,7 @@ namespace model_fitting
 //----------------------------------------------------------------------
 template <typename TSample>
 tCluster<TSample>::tCluster(const TSample &center)
-    : center(center),
+  : center(center),
     sum_of_norms(0),
     normalization_factor(0)
 {}

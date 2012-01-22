@@ -73,7 +73,7 @@ namespace model_fitting
 //----------------------------------------------------------------------
 template <typename TSample>
 tRansacModel<TSample>::tRansacModel(bool local_optimization)
-    : local_optimization(local_optimization),
+  : local_optimization(local_optimization),
     inlier_ratio(0),
     error(0)
 {}

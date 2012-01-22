@@ -71,7 +71,7 @@ namespace model_fitting
 */
 template <size_t Tdegree>
 class tRansacLeastSquaresPolynomial : public tLeastSquaresPolynomial<Tdegree>,
-    public tRansacModel<typename tLeastSquaresPolynomial<Tdegree>::tSample>
+  public tRansacModel<typename tLeastSquaresPolynomial<Tdegree>::tSample>
 {
 
   typedef model_fitting::tRansacModel<typename tLeastSquaresPolynomial<Tdegree>::tSample> tRansacModel;

@@ -152,7 +152,7 @@ void tXMeansClustering<TSample>::Solve(unsigned int max_clusters, TIterator samp
     std::cout << "Computing cutoff value for new candidates..." << std::endl;
 
     // update cluster candidates (surviving vs. dead clusters)
-    std::sort(cluster_candidates.begin(), cluster_candidates.end(), [](const tClusterCandidate &a, const tClusterCandidate &b)
+    std::sort(cluster_candidates.begin(), cluster_candidates.end(), [](const tClusterCandidate & a, const tClusterCandidate & b)
     {
       return a.BValue() < b.BValue();
     });

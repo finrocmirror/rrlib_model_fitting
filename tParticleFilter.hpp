@@ -67,7 +67,7 @@ namespace model_fitting
 //----------------------------------------------------------------------
 template <typename TConfiguration>
 tParticleFilter<TConfiguration>::tParticleFilter(long int seed)
-    : number_of_particles(0),
+  : number_of_particles(0),
     rng_engine(seed)
 {}
 
@@ -154,7 +154,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
       this->particles.push_back(tParticle(configuration, score));
       RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Generated new particle with configuration ", this->particles.back().Configuration(), " and score ", this->particles.back().Score());
     }
-    std::sort(this->particles.begin(), this->particles.end(), [](const tParticle &a, const tParticle &b)
+    std::sort(this->particles.begin(), this->particles.end(), [](const tParticle & a, const tParticle & b)
     {
       return a.Score() > b.Score();
     });
@@ -210,7 +210,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
   std::advance(new_end, new_configurations.size());
   this->particles.erase(new_end, this->particles.end());
 
-  std::sort(this->particles.begin(), this->particles.end(), [](const tParticle &a, const tParticle &b)
+  std::sort(this->particles.begin(), this->particles.end(), [](const tParticle & a, const tParticle & b)
   {
     return a.Score() > b.Score();
   });

@@ -77,7 +77,7 @@ namespace model_fitting
 // tRansacPlane3D constructors
 //----------------------------------------------------------------------
 tRansacPlane3D::tRansacPlane3D(bool local_optimization)
-    : tRansacModel(local_optimization)
+  : tRansacModel(local_optimization)
 {}
 
 //----------------------------------------------------------------------
