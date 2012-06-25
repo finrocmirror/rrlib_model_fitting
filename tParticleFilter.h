@@ -102,7 +102,7 @@ public:
     }
   };
 
-  explicit tParticleFilter(long int seed = time(NULL));
+  explicit tParticleFilter(long int seed = ::time(NULL));
 
   virtual ~tParticleFilter() = 0;
 
