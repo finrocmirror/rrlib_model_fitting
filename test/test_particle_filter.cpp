@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 {
   rrlib::logging::default_log_description = basename(argv[0]);
 
-  rrlib::logging::SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_1);
+  rrlib::logging::SetDomainMaxMessageLevel(".", rrlib::logging::tLogLevel::DEBUG_VERBOSE_1);
   rrlib::logging::SetDomainPrintsLocation(".", false);
 
   tWindow &window = tWindow::GetInstance("Particle Filter Tests", 500, 500);

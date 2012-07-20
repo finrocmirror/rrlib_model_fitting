@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 {
   rrlib::logging::default_log_description = basename(argv[0]);
 
-  rrlib::logging::SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_3);
+  rrlib::logging::SetDomainMaxMessageLevel(".", rrlib::logging::tLogLevel::DEBUG_VERBOSE_3);
   rrlib::logging::SetDomainPrintsLocation(".", false);
 
   tWindow &window = tWindow::GetInstance("Least Squares Polynomial Tests", 500, 500);

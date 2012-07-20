@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 {
   rrlib::logging::default_log_description = basename(argv[0]);
 
-  rrlib::logging::SetDomainMaxMessageLevel(".", rrlib::logging::eLL_DEBUG_VERBOSE_3);
+  rrlib::logging::SetDomainMaxMessageLevel(".", rrlib::logging::tLogLevel::DEBUG_VERBOSE_3);
   rrlib::logging::SetDomainPrintsLocation(".", false);
 
   IplImage *image = cvCreateImage(cvSize(320, 240), IPL_DEPTH_8U, 3);

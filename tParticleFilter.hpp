@@ -99,7 +99,7 @@ void tParticleFilter<TConfiguration>::Initialize(unsigned int number_of_particle
 template <typename TConfiguration>
 TConfiguration tParticleFilter<TConfiguration>::GenerateConfiguration(const tConfiguration &center) const
 {
-  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Generating particle around ", center, " with variance ", this->variance, ".");
+  RRLIB_LOG_PRINT(DEBUG_VERBOSE_3, "Generating particle around ", center, " with variance ", this->variance, ".");
   while (true)
   {
     tConfiguration configuration;
@@ -113,14 +113,14 @@ TConfiguration tParticleFilter<TConfiguration>::GenerateConfiguration(const tCon
     {
       if (this->lower_bound[i] > configuration[i] || configuration[i] > this->upper_bound[i])
       {
-        RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Rejecting ", configuration);
+        RRLIB_LOG_PRINT(DEBUG_VERBOSE_3, "Rejecting ", configuration);
         accept = false;
         break;
       }
     }
     if (accept)
     {
-      RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Accepting ", configuration);
+      RRLIB_LOG_PRINT(DEBUG_VERBOSE_3, "Accepting ", configuration);
       return configuration;
     }
   }
@@ -154,7 +154,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
       }
       double score = this->CalculateConfigurationScore(configuration);
       this->particles.push_back(tParticle(configuration, score));
-      RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_3, "Generated new particle with configuration ", this->particles.back().Configuration(), " and score ", this->particles.back().Score());
+      RRLIB_LOG_PRINT(DEBUG_VERBOSE_3, "Generated new particle with configuration ", this->particles.back().Configuration(), " and score ", this->particles.back().Score());
     }
     std::sort(this->particles.begin(), this->particles.end(), [](const tParticle & a, const tParticle & b)
     {
@@ -168,7 +168,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
     total_score += it->Score();
   }
 
-  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Total score: ", total_score);
+  RRLIB_LOG_PRINT(DEBUG_VERBOSE_1, "Total score: ", total_score);
 
   if (total_score > 0.0)
   {
@@ -180,7 +180,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
 
   size_t resampling_size = 0.9 * this->number_of_particles;
 
-  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Resampling ", resampling_size, " particles...");
+  RRLIB_LOG_PRINT(DEBUG_VERBOSE_1, "Resampling ", resampling_size, " particles...");
 
   std::vector<tConfiguration> new_configurations;
   new_configurations.reserve(this->number_of_particles);
@@ -188,7 +188,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
   {
     size_t number_of_clones = this->number_of_particles * this->particles[i].score;
 
-    RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Resampling ", number_of_clones, " particles from ", this->particles[i].configuration, " with score ", this->particles[i].score, ".");
+    RRLIB_LOG_PRINT(DEBUG_VERBOSE_2, "Resampling ", number_of_clones, " particles from ", this->particles[i].configuration, " with score ", this->particles[i].score, ".");
 
     if (resampling_size == 0 || new_configurations.size() + number_of_clones > resampling_size)
     {
@@ -206,7 +206,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
     this->particles[i].score = this->CalculateConfigurationScore(this->particles[i].configuration);
   }
 
-  RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_2, "Resampled ", new_configurations.size(), " particles.");
+  RRLIB_LOG_PRINT(DEBUG_VERBOSE_2, "Resampled ", new_configurations.size(), " particles.");
 
   typename std::vector<tParticle>::iterator new_end = this->particles.begin();
   std::advance(new_end, new_configurations.size());

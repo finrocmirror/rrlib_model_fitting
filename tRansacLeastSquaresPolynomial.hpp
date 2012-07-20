@@ -127,7 +127,7 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToSampleIndexSet(const std
   }
   catch (std::logic_error &exception)
   {
-    RRLIB_LOG_PRINT(logging::eLL_DEBUG_VERBOSE_1, "Failed to update model from sample set: ", exception.what());
+    RRLIB_LOG_PRINT(DEBUG_VERBOSE_1, "Failed to update model from sample set: ", exception.what());
     return false;
   }
   return true;
