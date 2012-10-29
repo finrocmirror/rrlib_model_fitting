@@ -33,6 +33,8 @@
 //----------------------------------------------------------------------
 #include <vector>
 
+#include "rrlib/math/utilities.h"
+
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
@@ -139,7 +141,7 @@ const bool tRansacLeastSquaresPolynomial<Tdegree>::FitToSampleIndexSet(const std
 template <size_t Tdegree>
 const double tRansacLeastSquaresPolynomial<Tdegree>::GetSampleError(const tSample &sample) const
 {
-  return AbsoluteValue(sample.Y() - (*this)(sample.X()));
+  return math::AbsoluteValue(sample.Y() - (*this)(sample.X()));
 }
 
 //----------------------------------------------------------------------
