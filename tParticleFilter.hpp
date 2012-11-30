@@ -85,28 +85,34 @@ tParticleFilter<TConfiguration>::~tParticleFilter()
 //----------------------------------------------------------------------
 template <typename TConfiguration>
 void tParticleFilter<TConfiguration>::Initialize(unsigned int number_of_particles,
-    const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance)
+    const tConfiguration &lower_bound, const tConfiguration &upper_bound, const typename tMultivariateNormalDistribution::tCovariance &covariance)
 {
   assert(number_of_particles > 0);
   this->number_of_particles = number_of_particles;
   this->lower_bound = lower_bound;
   this->upper_bound = upper_bound;
-  this->variance = variance;
+  this->multivariate_normal_distribution = tMultivariateNormalDistribution(tConfiguration::Zero(), covariance);
 
   this->particles.reserve(this->number_of_particles);
 }
 
 template <typename TConfiguration>
+void tParticleFilter<TConfiguration>::Initialize(unsigned int number_of_particles,
+    const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance)
+{
+  this->Initialize(number_of_particles, lower_bound, upper_bound, tMultivariateNormalDistribution::tCovariance::Diagonal(variance));
+}
+
+//----------------------------------------------------------------------
+// tParticleFilter GenerateConfiguration
+//----------------------------------------------------------------------
+template <typename TConfiguration>
 TConfiguration tParticleFilter<TConfiguration>::GenerateConfiguration(const tConfiguration &center) const
 {
-  RRLIB_LOG_PRINT(DEBUG_VERBOSE_3, "Generating particle around ", center, " with variance ", this->variance, ".");
+  RRLIB_LOG_PRINT(DEBUG_VERBOSE_3, "Generating particle around ", center, " with covariance ", this->multivariate_normal_distribution.Covariance(), ".");
   while (true)
   {
-    tConfiguration configuration;
-    for (size_t i = 0; i < tConfiguration::cDIMENSION; ++i)
-    {
-      configuration[i] = std::normal_distribution<typename tConfiguration::tElement>(center[i], std::sqrt(this->variance[i]))(this->rng_engine);
-    }
+    tConfiguration configuration = center + this->multivariate_normal_distribution(this->rng_engine);
 
     bool accept = true;
     for (size_t i = 0; i < TConfiguration::cDIMENSION; ++i)

@@ -42,6 +42,8 @@
 #include <vector>
 #include <random>
 
+#include "rrlib/math/tMultivariateNormalDistribution.h"
+
 //----------------------------------------------------------------------
 // Internal includes with ""
 //----------------------------------------------------------------------
@@ -78,6 +80,7 @@ class tParticleFilter
 public:
 
   typedef TConfiguration tConfiguration;
+  typedef math::tMultivariateNormalDistribution<tConfiguration::cDIMENSION, typename tConfiguration::tElement> tMultivariateNormalDistribution;
 
   class tParticle
   {
@@ -107,6 +110,9 @@ public:
   virtual ~tParticleFilter() = 0;
 
   void Initialize(unsigned int number_of_particles,
+                  const tConfiguration &lower_bound, const tConfiguration &upper_bound, const typename tMultivariateNormalDistribution::tCovariance &covariance);
+
+  void Initialize(unsigned int number_of_particles,
                   const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance);
 
   void PerformUpdate();
@@ -124,9 +130,9 @@ private:
   unsigned int number_of_particles;
   tConfiguration lower_bound;
   tConfiguration upper_bound;
-  tConfiguration variance;
 
   mutable std::mt19937 rng_engine;
+  mutable tMultivariateNormalDistribution multivariate_normal_distribution;
 
   std::vector<tParticle> particles;
 
