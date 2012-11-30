@@ -196,7 +196,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
 
     RRLIB_LOG_PRINT(DEBUG_VERBOSE_2, "Resampling ", number_of_clones, " particles from ", this->particles[i].configuration, " with score ", this->particles[i].score, ".");
 
-    if (resampling_size == 0 || new_configurations.size() + number_of_clones > resampling_size)
+    if (number_of_clones == 0 || new_configurations.size() + number_of_clones > resampling_size)
     {
       break;
     }
