@@ -102,7 +102,7 @@ int main(int argc, char **argv)
   ground_truth[0].Set(0.5, 0.75);
 
   tPointFinder point_finder;
-  point_finder.Initialize(1000, tConfiguration::Zero(), tConfiguration(1, 1), tConfiguration(0.001, 0.001));
+  point_finder.Initialize(1000, tConfiguration::Zero(), tConfiguration(1, 1), tPointFinder::tCovariance::Diagonal(0.001, 0.001));
 
   window.Clear();
   window.SetColor(0);

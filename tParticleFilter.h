@@ -73,6 +73,7 @@ namespace model_fitting
 template <typename TConfiguration>
 class tParticleFilter
 {
+  typedef math::tMultivariateNormalDistribution<TConfiguration::cDIMENSION, typename TConfiguration::tElement> tMultivariateNormalDistribution;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
@@ -80,7 +81,7 @@ class tParticleFilter
 public:
 
   typedef TConfiguration tConfiguration;
-  typedef math::tMultivariateNormalDistribution<tConfiguration::cDIMENSION, typename tConfiguration::tElement> tMultivariateNormalDistribution;
+  typedef typename tMultivariateNormalDistribution::tCovariance tCovariance;
 
   class tParticle
   {
@@ -110,10 +111,21 @@ public:
   virtual ~tParticleFilter() = 0;
 
   void Initialize(unsigned int number_of_particles,
-                  const tConfiguration &lower_bound, const tConfiguration &upper_bound, const typename tMultivariateNormalDistribution::tCovariance &covariance);
+                  const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tCovariance &covariance, double resampling_ratio = 0.9);
 
   void Initialize(unsigned int number_of_particles,
-                  const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance);
+                  const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance, double resampling_ratio = 0.9) __attribute__((deprecated));
+
+  inline void SetResamplingRatio(double resampling_ratio)
+  {
+    assert(0 <= resampling_ratio && resampling_ratio <= 1);
+    this->resampling_ratio = resampling_ratio;
+  }
+
+  inline void SetCovariance(const tCovariance &covariance)
+  {
+    this->multivariate_normal_distribution = tMultivariateNormalDistribution(tConfiguration::Zero(), covariance);
+  }
 
   void PerformUpdate();
 
@@ -130,6 +142,7 @@ private:
   unsigned int number_of_particles;
   tConfiguration lower_bound;
   tConfiguration upper_bound;
+  double resampling_ratio;
 
   mutable std::mt19937 rng_engine;
   mutable tMultivariateNormalDistribution multivariate_normal_distribution;

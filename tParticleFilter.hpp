@@ -85,22 +85,23 @@ tParticleFilter<TConfiguration>::~tParticleFilter()
 //----------------------------------------------------------------------
 template <typename TConfiguration>
 void tParticleFilter<TConfiguration>::Initialize(unsigned int number_of_particles,
-    const tConfiguration &lower_bound, const tConfiguration &upper_bound, const typename tMultivariateNormalDistribution::tCovariance &covariance)
+    const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tCovariance &covariance, double resampling_ratio)
 {
   assert(number_of_particles > 0);
   this->number_of_particles = number_of_particles;
   this->lower_bound = lower_bound;
   this->upper_bound = upper_bound;
-  this->multivariate_normal_distribution = tMultivariateNormalDistribution(tConfiguration::Zero(), covariance);
+  this->SetCovariance(covariance);
+  this->SetResamplingRatio(resampling_ratio);
 
   this->particles.reserve(this->number_of_particles);
 }
 
 template <typename TConfiguration>
 void tParticleFilter<TConfiguration>::Initialize(unsigned int number_of_particles,
-    const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance)
+    const tConfiguration &lower_bound, const tConfiguration &upper_bound, const tConfiguration &variance, double resampling_ratio)
 {
-  this->Initialize(number_of_particles, lower_bound, upper_bound, tMultivariateNormalDistribution::tCovariance::Diagonal(variance));
+  this->Initialize(number_of_particles, lower_bound, upper_bound, tCovariance::Diagonal(variance), resampling_ratio);
 }
 
 //----------------------------------------------------------------------
@@ -184,7 +185,7 @@ void tParticleFilter<TConfiguration>::PerformUpdate()
     }
   }
 
-  size_t resampling_size = 0.9 * this->number_of_particles;
+  size_t resampling_size = this->resampling_ratio * this->number_of_particles;
 
   RRLIB_LOG_PRINT(DEBUG_VERBOSE_1, "Resampling ", resampling_size, " particles...");
 
