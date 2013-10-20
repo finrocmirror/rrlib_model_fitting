@@ -2,7 +2,7 @@
 <!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://rrlib.org/xml/1.0/make.dtd">
 <targets>
 
-  <rrlib name="model_fitting">
+  <rrlib>
     <sources>
       cluster_analysis/*
       tParticleFilter.h
@@ -12,7 +12,7 @@
     </sources>
   </rrlib>
 
-  <rrlib name="model_fitting_ransac_plane_3d"
+  <rrlib name="ransac_plane_3d"
         libs="opencv_core">
     <sources>
       tRansacPlane3D.cpp
