@@ -72,7 +72,7 @@ public:
 
   typedef geometry::tBoundingBox<TSample::cDIMENSION, typename TSample::tElement> tBoundingBox;
 
-  typedef std::function < typename TSample::tElement(const TSample &a, const TSample &b) > tMetric;
+  typedef std::function <typename TSample::tElement(const TSample &a, const TSample &b)> tMetric;
 
   tCluster(const TSample &center);
 
