@@ -36,8 +36,12 @@
 // Internal includes with ""
 //----------------------------------------------------------------------
 
-#ifdef RRLIB_MODEL_FITTING_DEBUG_KMEANS
-#include "rrlib/highgui_wrapper/tWindow.h"
+#ifdef _LIB_RRLIB_HIGHGUI_WRAPPER_PRESENT_
+# ifdef RRLIB_MODEL_FITTING_DEBUG_KMEANS
+#  include "rrlib/highgui_wrapper/tWindow.h"
+# endif
+#else
+# undef RRLIB_MODEL_FITTING_DEBUG_KMEANS
 #endif
 
 //----------------------------------------------------------------------
