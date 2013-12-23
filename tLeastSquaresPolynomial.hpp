@@ -108,7 +108,7 @@ void tLeastSquaresPolynomial<Tdegree>::DoLinearRegression(TIterator begin, TIter
    * S(xi^n*xi^0)   ...   S(xi^n*xi^n)   |   S(xi^n*yi)
    *
    */
-  math::tMatrix < Tdegree + 1, Tdegree + 1, double, math::matrix::Symmetrical > A;
+  math::tMatrix < Tdegree + 1, Tdegree + 1, double > A;
   math::tVector < Tdegree + 1, double > b;
 
   for (TIterator it = begin; it != end; ++it)
