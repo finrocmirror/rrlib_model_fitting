@@ -15,7 +15,7 @@
   <rrlib name="ransac_plane_3d"
         libs="opencv_core">
     <sources>
-      tRansacPlane3D.cpp
+      tRansacPlane3D.h
     </sources>
   </rrlib>
 

@@ -71,17 +71,18 @@ namespace model_fitting
 /*! A more detailed description of tRansacPlane3D, which
     Tobias Foehst hasn't done yet !!
 */
-class tRansacPlane3D : public geometry::tPlane3D, public tRansacModel<geometry::tPlane3D::tPoint>
+template <typename TElement = double>
+class tRansacPlane3D : public geometry::tPlane<3, TElement>, public model_fitting::tRansacModel<typename geometry::tPlane<3, TElement>::tPoint>
 {
 
-  typedef model_fitting::tRansacModel<geometry::tPlane3D::tPoint> tRansacModel;
+  typedef model_fitting::tRansacModel<typename geometry::tPlane<3, TElement>::tPoint> tRansacModel;
 
 //----------------------------------------------------------------------
 // Public methods and typedefs
 //----------------------------------------------------------------------
 public:
 
-  typedef geometry::tPlane3D::tPoint tSample;
+  typedef typename geometry::tPlane<3, TElement>::tPoint tSample;
 
   explicit tRansacPlane3D(bool local_optimization = false);
 
@@ -178,7 +179,7 @@ private:
   struct tPointConstraint
   {
     bool active;
-    geometry::tPlane3D::tPoint reference_point;
+    tSample reference_point;
     double min_distance;
     double max_distance;
     tPointConstraint() : active(false) {}
@@ -202,5 +203,7 @@ private:
 //----------------------------------------------------------------------
 }
 }
+
+#include "rrlib/model_fitting/tRansacPlane3D.hpp"
 
 #endif
