@@ -73,10 +73,10 @@ namespace model_fitting
 // tXMeansClustering constructors
 //----------------------------------------------------------------------
 template <typename TSample>
-template <typename TIterator>
+template <typename TIterator, typename Metric>
 tXMeansClustering<TSample>::tXMeansClustering(unsigned int max_clusters,
     TIterator samples_begin, TIterator samples_end,
-    typename tXMeansClustering::tMetric metric)
+    Metric metric)
 {
   assert(max_clusters > 0);
   this->Solve(max_clusters, samples_begin, samples_end, metric);
@@ -86,8 +86,8 @@ tXMeansClustering<TSample>::tXMeansClustering(unsigned int max_clusters,
 // tXMeansClustering Solve
 //----------------------------------------------------------------------
 template <typename TSample>
-template <typename TIterator>
-void tXMeansClustering<TSample>::Solve(unsigned int max_clusters, TIterator samples_begin, TIterator samples_end, typename tXMeansClustering::tMetric metric)
+template <typename TIterator, typename Metric>
+void tXMeansClustering<TSample>::Solve(unsigned int max_clusters, TIterator samples_begin, TIterator samples_end, Metric metric)
 {
   std::cout << "Preprocessing" << std::endl;
 
@@ -257,7 +257,8 @@ void tXMeansClustering<TSample>::Solve(unsigned int max_clusters, TIterator samp
 // tXMeansClustering::tClusterCandidate Split
 //----------------------------------------------------------------------
 template <typename TSample>
-void tXMeansClustering<TSample>::tClusterCandidate::Split(typename tXMeansClustering::tMetric metric)
+template <typename Metric>
+void tXMeansClustering<TSample>::tClusterCandidate::Split(Metric metric)
 {
   if (this->cluster.Samples().size() < 2)
   {

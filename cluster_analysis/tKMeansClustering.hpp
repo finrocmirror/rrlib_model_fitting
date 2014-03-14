@@ -75,10 +75,10 @@ namespace model_fitting
 // tKMeansClustering constructors
 //----------------------------------------------------------------------
 template <typename TSample>
-template <typename TIterator>
+template <typename TIterator, typename Metric>
 tKMeansClustering<TSample>::tKMeansClustering(unsigned int k,
     TIterator samples_begin, TIterator samples_end,
-    typename tKMeansClustering::tMetric metric)
+    Metric metric)
 {
   assert(k > 0);
   assert(std::distance(samples_begin, samples_end) > 0);
@@ -90,11 +90,11 @@ tKMeansClustering<TSample>::tKMeansClustering(unsigned int k,
 }
 
 template <typename TSample>
-template <typename TIterator>
+template <typename TIterator, typename Metric>
 tKMeansClustering<TSample>::tKMeansClustering(unsigned int k,
     TIterator samples_begin, TIterator samples_end,
     const tKDTree &kd_tree,
-    typename tKMeansClustering::tMetric metric)
+    Metric metric)
 {
   assert(k > 0);
   assert(std::distance(samples_begin, samples_end) > 0);
@@ -105,10 +105,10 @@ tKMeansClustering<TSample>::tKMeansClustering(unsigned int k,
 }
 
 template <typename TSample>
-template <typename TIterator>
+template <typename TIterator, typename Metric>
 tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator samples_end,
     TIterator initial_positions_begin, TIterator initial_positions_end,
-    typename tKMeansClustering::tMetric metric)
+    Metric metric)
 {
   unsigned int k = std::distance(initial_positions_begin, initial_positions_end);
   assert(k > 0);
@@ -124,11 +124,11 @@ tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator
 }
 
 template <typename TSample>
-template <typename TIterator>
+template <typename TIterator, typename Metric>
 tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator samples_end,
     TIterator initial_positions_begin, TIterator initial_positions_end,
     const tKDTree &kd_tree,
-    typename tKMeansClustering::tMetric metric)
+    Metric metric)
 {
   unsigned int k = std::distance(initial_positions_begin, initial_positions_end);
   assert(k > 0);
@@ -146,7 +146,8 @@ tKMeansClustering<TSample>::tKMeansClustering(TIterator samples_begin, TIterator
 // tKMeansClustering DistanceToNode
 //----------------------------------------------------------------------
 template <typename TSample>
-typename TSample::tElement tKMeansClustering<TSample>::DistanceToNode(const TSample &x, const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric) const
+template <typename Metric>
+typename TSample::tElement tKMeansClustering<TSample>::DistanceToNode(const TSample &x, const typename tKDTree::tNode &node, Metric metric) const
 {
   // clip a copy of x to the hyper-rectangle ...
   TSample y(x);
@@ -162,7 +163,8 @@ typename TSample::tElement tKMeansClustering<TSample>::DistanceToNode(const TSam
 // tKMeansClustering UpdateFromKDTreeNode
 //----------------------------------------------------------------------
 template <typename TSample>
-void tKMeansClustering<TSample>::UpdateFromKDTreeNode(const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric)
+template <typename Metric>
+void tKMeansClustering<TSample>::UpdateFromKDTreeNode(const typename tKDTree::tNode &node, Metric metric)
 {
   // special treatment for leaves
   if (node.IsLeaf())
@@ -233,8 +235,8 @@ void tKMeansClustering<TSample>::UpdateFromKDTreeNode(const typename tKDTree::tN
 // tKMeansClustering Solve
 //----------------------------------------------------------------------
 template <typename TSample>
-template <class TIterator>
-void tKMeansClustering<TSample>::Solve(TIterator samples_begin, TIterator samples_end, const tKDTree &kd_tree, const typename tKMeansClustering::tMetric &metric)
+template <class TIterator, typename Metric>
+void tKMeansClustering<TSample>::Solve(TIterator samples_begin, TIterator samples_end, const tKDTree &kd_tree, Metric metric)
 {
 
 #ifdef RRLIB_MODEL_FITTING_DEBUG_KMEANS

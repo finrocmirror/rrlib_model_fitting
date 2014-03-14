@@ -92,14 +92,12 @@ namespace model_fitting
  * typedef tXMeansClustering<2, float> tClustering;  // just use a typedef to instantiate the template
  *
  * // an own metric to show the generic capabilities of this class
- * // for simplicity it is recommended to use the provided typedef of the template-class, bearing in mind that tMeasurement is always an instantiation of rrlib::math::tVector
- * struct tManhattanNorm : public tClustering::tMetric
+ * tClustering::tSample::tElement ManhattanNorm(const tClustering::tSample &a, const tClustering::tSample &b)
  * {
- *   inline const tClustering::tMetric::result_type operator() (const tClustering::tMetric::first_argument_type &x, const tClustering::tMetric::second_argument_type &y) const {
- *     tClustering::tMetric::result_type result = 0;
- *     for (size_t i = 0; i < tClustering::tMeasurement::eDIMENSION; i++)
+ *     tClustering::tSample::tElement result = 0;
+ *     for (size_t i = 0; i < tClustering::tSample::eDIMENSION; ++i)
  *     {
- *       result += std::abs(x[i] - y[i]);
+ *       result += std::abs(a[i] - b[i]);
  *     }
  *     return result;
  *   }
@@ -110,8 +108,8 @@ namespace model_fitting
  *   std::vector<tClustering::tMeasurement> data;
  *   // ... fill data
  *
- *   tClustering clustering(data.size(), data);                   // using the default (Euklidian) norm
- * //  tClustering clustering(data.size(), data, tManhattanNorm()); // using an own defined norm
+ *   tClustering clustering(data.size(), data);                  // using the default (Euclidian) norm
+ * //  tClustering clustering(data.size(), data, ManhattanNorm);   // using an own defined norm
  *
  *   std::cout << "Found " << clustering.GetNumberOfClusters() << " clusters:" << std::endl;
  *   for (size_t i = 0; i < clustering.GetNumberOfClusters(); i++)
@@ -147,10 +145,10 @@ public:
    * \param measurements   The measurements to process
    * \param epsilon        The termination-criterion
    */
-  template <typename TIterator>
+  template <typename TIterator, typename Metric = decltype(TSample::EuclideanDistance)>
   tXMeansClustering(unsigned int max_clusters,
                     TIterator samples_begin, TIterator samples_end,
-                    typename tXMeansClustering::tMetric metric = TSample::cEUCLIDEAN_DISTANCE);
+                    Metric metric = TSample::EuclideanDistance);
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -185,7 +183,8 @@ private:
       return this->bvalue;
     }
 
-    inline void Split(typename tXMeansClustering::tMetric metric);
+    template <typename Metric>
+    inline void Split(Metric metric);
 
     //----------------------------------------------------------------------
     // Private fields and methods
@@ -209,8 +208,8 @@ private:
    * \param metric                      A functor which computes an appropriate metric
    * \param epsilon                     The termination-criterion
    */
-  template <typename TIterator>
-  void Solve(unsigned int max_clusters, TIterator samples_begin, TIterator samples_end, typename tXMeansClustering::tMetric metric);
+  template <typename TIterator, typename Metric>
+  void Solve(unsigned int max_clusters, TIterator samples_begin, TIterator samples_end, Metric metric);
 
 };
 
