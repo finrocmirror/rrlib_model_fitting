@@ -89,15 +89,12 @@ namespace model_fitting
  * typedef tKMeansClustering<2, float> tClustering;  // just use a typedef to instantiate the template
  *
  * // an own metric to show the generic capabilities of this class
- * // for simplicity it is recommended to use the provided typedef of the template-class, bearing in mind that tMeasurement is always an instantiation of rrlib::math::tVector
- * struct tManhattanNorm : public tClustering::tMetric
+ * tClustering::tSample::tElement ManhattanNorm(const tClustering::tSample &a, const tClustering::tSample &b)
  * {
- *   inline const tClustering::tMetric::result_type operator() (const tClustering::tMetric::first_argument_type &x, const tClustering::tMetric::second_argument_type &y) const
- *   {
- *     tClustering::tMetric::result_type result = 0;
- *     for (size_t i = 0; i < tClustering::tMeasurement::eDIMENSION; i++)
+ *     tClustering::tSample::tElement result = 0;
+ *     for (size_t i = 0; i < tClustering::tSample::eDIMENSION; ++i)
  *     {
- *       result += std::abs(x[i] - y[i]);
+ *       result += std::abs(a[i] - b[i]);
  *     }
  *     return result;
  *   }
@@ -109,7 +106,7 @@ namespace model_fitting
  *   // ... fill data
  *
  *   // assuming 6 clusters the algorithm can be executed by
- *   tClustering clustering(6, data);                   // using the default (Euklidian) norm
+ *   tClustering clustering(6, data);                   // using the default (Euclidian) norm
  * //  tClustering clustering(6, data, tManhattanNorm()); // using an own defined norm
  *
  *   for (size_t i = 0; i < clustering.GetNumberOfClusters(); i++)
@@ -147,27 +144,27 @@ public:
    * \param initial_cluster_positions   A list of initial positions where clusters are expected
    * \param epsilon                     The termination-criterion
    */
-  template <typename TIterator>
+  template <typename TIterator, typename Metric = decltype(TSample::EuclideanDistance)>
   tKMeansClustering(unsigned int k,
                     TIterator samples_begin, TIterator samples_end,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
+                    Metric metric = TSample::EuclideanDistance);
 
-  template <typename TIterator>
+  template <typename TIterator, typename Metric = decltype(TSample::EuclideanDistance)>
   tKMeansClustering(unsigned int k,
                     TIterator samples_begin, TIterator samples_end,
                     const tKDTree &kd_tree,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
+                    Metric metric = TSample::EuclideanDistance);
 
-  template <typename TIterator>
+  template <typename TIterator, typename Metric = decltype(TSample::EuclideanDistance)>
   tKMeansClustering(TIterator samples_begin, TIterator samples_end,
                     TIterator initial_positions_begin, TIterator initial_positions_end,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
+                    Metric metric = TSample::EuclideanDistance);
 
-  template <typename TIterator>
+  template <typename TIterator, typename Metric = decltype(TSample::EuclideanDistance)>
   tKMeansClustering(TIterator samples_begin, TIterator samples_end,
                     TIterator initial_positions_begin, TIterator initial_positions_end,
                     const tKDTree &kd_tree,
-                    typename tKMeansClustering::tMetric metric = tKMeansClustering::cDEFAULT_METRIC);
+                    Metric metric = TSample::EuclideanDistance);
 
 //----------------------------------------------------------------------
 // Private fields and methods
@@ -183,7 +180,8 @@ private:
    *
    * \return The distance from the point to the node
    */
-  typename TSample::tElement DistanceToNode(const TSample &x, const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric) const;
+  template <typename Metric>
+  typename TSample::tElement DistanceToNode(const TSample &x, const typename tKDTree::tNode &node, Metric metric) const;
 
   /*!
    * \brief Update the clusters from the given kd-tree node recursively
@@ -191,7 +189,8 @@ private:
    * \param node     The kd-tree node to process
    * \param metric   The functor which computes an appropriate metric
    */
-  void UpdateFromKDTreeNode(const typename tKDTree::tNode &node, typename tKMeansClustering::tMetric metric);
+  template <typename Metric>
+  void UpdateFromKDTreeNode(const typename tKDTree::tNode &node, Metric metric);
 
   /*!
    * \brief Execute the algorithm
@@ -201,8 +200,8 @@ private:
    * \param metric                      A functor which computes an appropriate metric
    * \param epsilon                     The termination-criterion
    */
-  template <typename TIterator>
-  void Solve(TIterator samples_begin, TIterator samples_end, const tKDTree &kd_tree, const typename tKMeansClustering::tMetric &metric);
+  template <typename TIterator, typename Metric>
+  void Solve(TIterator samples_begin, TIterator samples_end, const tKDTree &kd_tree, Metric metric);
 
   /*!
    * \brief Generates cluster positions using a heuristic on the kd-tree

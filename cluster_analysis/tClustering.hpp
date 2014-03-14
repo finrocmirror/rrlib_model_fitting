@@ -56,8 +56,6 @@ namespace model_fitting
 //----------------------------------------------------------------------
 // Const values
 //----------------------------------------------------------------------
-template <typename TSample>
-const typename tClustering<TSample>::tMetric tClustering<TSample>::cDEFAULT_METRIC = TSample::cEUCLIDEAN_DISTANCE;
 
 //----------------------------------------------------------------------
 // Implementation
@@ -95,7 +93,8 @@ void tClustering<TSample>::Sort()
 // tClustering GetNearestClusterID
 //----------------------------------------------------------------------
 template <typename TSample>
-size_t tClustering<TSample>::GetNearestClusterID(const TSample &sample, tMetric metric)
+template <typename Metric>
+size_t tClustering<TSample>::GetNearestClusterID(const TSample &sample, Metric metric)
 {
   auto nearest_cluster = this->clusters.end();
   typename TSample::tElement min_distance = std::numeric_limits<typename TSample::tElement>::max();

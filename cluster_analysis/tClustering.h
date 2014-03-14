@@ -77,10 +77,6 @@ public:
 
   typedef model_fitting::tCluster<TSample> tCluster;
 
-  typedef typename TSample::tMetric tMetric;
-
-  static const tMetric cDEFAULT_METRIC;
-
   virtual ~tClustering() = 0;
 
   inline const std::vector<tCluster> &Clusters() const;
@@ -105,7 +101,8 @@ protected:
    *
    * \return The cluster which has the smallest distance to the given measurement in terms of the given metric
    */
-  size_t GetNearestClusterID(const TSample &sample, tMetric metric);
+  template <typename Metric>
+  size_t GetNearestClusterID(const TSample &sample, Metric metric);
 
 //----------------------------------------------------------------------
 // Private fields and methods
