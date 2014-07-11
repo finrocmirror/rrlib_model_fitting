@@ -153,7 +153,7 @@ const bool tRansacPlane3D<TElement>::FitToMinimalSampleIndexSet(const std::vecto
 
   if (this->normal_constraint.active)
   {
-    if (EnclosedAngle(this->Normal(), this->normal_constraint.direction) > math::tAngleRadUnsigned(math::tAngleDegUnsigned(90)))
+    if (EnclosedAngle(this->Normal(), this->normal_constraint.direction) > math::tAngleRad(math::tAngleDegUnsigned(90)))
     {
       this->Set(this->Support(), -this->Normal());
     }
@@ -245,7 +245,7 @@ const bool tRansacPlane3D<TElement>::CheckConstraints() const
   {
     RRLIB_LOG_PRINT(DEBUG_VERBOSE_2, "Checking normal constraint:");
 
-    if (EnclosedAngle(this->Normal(), this->normal_constraint.direction) > this->normal_constraint.max_angle_distance)
+    if (EnclosedAngle(this->Normal(), this->normal_constraint.direction) > rrlib::math::tAngleRad(this->normal_constraint.max_angle_distance))
     {
       RRLIB_LOG_PRINT(DEBUG_VERBOSE_2, "Failed!");
       return false;
