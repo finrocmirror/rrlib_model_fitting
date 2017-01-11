@@ -74,6 +74,7 @@ namespace model_fitting
 template <typename TSample>
 tRansacModel<TSample>::tRansacModel(bool local_optimization)
   : local_optimization(local_optimization),
+    number_of_inliers(0),
     inlier_ratio(0),
     error(0)
 {}
@@ -104,6 +105,7 @@ void tRansacModel<TSample>::Clear()
 {
   this->samples.clear();
   this->assignments.clear();
+  this->number_of_inliers = 0;
   this->inlier_ratio = 0;
   this->error = 0;
   RRLIB_LOG_PRINT(DEBUG_VERBOSE_1, "Model cleared.");
