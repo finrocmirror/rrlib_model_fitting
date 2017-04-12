@@ -158,6 +158,13 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
     double total_error = this->DetermineConsensusIndexSet(consensus_index_set, max_error);
     size_t support = consensus_index_set.size();
 
+    // check size of consensus set
+    if (support < this->MinimalSetSize())
+    {
+      RRLIB_LOG_PRINT(DEBUG_WARNING, "Not enough support to build a consensus set. Skipping iteration.");
+      continue;
+    }
+
     // proceed if we found better support or lower error
     if (support > max_support || (support == max_support && total_error < min_error))
     {
@@ -178,7 +185,7 @@ const bool tRansacModel<TSample>::DoRANSAC(unsigned int max_iterations, double s
           double total_error = this->DetermineConsensusIndexSet(consensus_index_set, max_error);
           size_t support = consensus_index_set.size();
 
-          if (support > max_support || (support == max_support && total_error < min_error))
+          if (support >= this->MinimalSetSize() && (support > max_support || (support == max_support && total_error < min_error)))
           {
             RRLIB_LOG_PRINT(DEBUG_VERBOSE_2, "Local Optimization yielded better model with support ", support, " and total inlier error ", total_error);
 
