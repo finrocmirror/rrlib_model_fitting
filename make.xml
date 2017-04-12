@@ -12,8 +12,9 @@
     </sources>
   </library>
 
-  <library name="ransac_plane_3d" libs="opencv_core">
+  <library name="with_opencv" libs="opencv_core">
     <sources>
+      tIterativeClosestPoint.h
       tRansacPlane3D.h
     </sources>
   </library>

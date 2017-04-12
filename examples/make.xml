@@ -6,5 +6,6 @@
   <program name="particle_filter" sources="particle_filter.cpp" />
   <program name="ransac_color_detection" sources="ransac_color_detection.cpp" />
   <program name="cluster_analysis" sources="cluster_analysis.cpp" />
+  <program name="icp" sources="icp.cpp" />
 
 </targets>
