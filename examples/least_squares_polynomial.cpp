@@ -19,9 +19,9 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    test_least_squares_polynomial.cpp
+/*!\file    rrlib/model_fitting/examples/least_squares_polynomial.cpp
  *
- * \author  Tobias Foehst
+ * \author  Tobias Föhst
  *
  * \date    2011-01-02
  *

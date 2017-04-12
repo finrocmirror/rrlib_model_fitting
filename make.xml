@@ -2,7 +2,7 @@
 <!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://rrlib.org/xml/1.0/make.dtd">
 <targets>
 
-  <rrlib>
+  <library>
     <sources>
       cluster_analysis/*
       tParticleFilter.h
@@ -10,38 +10,12 @@
       tRansacLeastSquaresPolynomial.h
       tRansacModel.h
     </sources>
-  </rrlib>
+  </library>
 
-  <rrlib name="ransac_plane_3d"
-        libs="opencv_core">
+  <library name="ransac_plane_3d" libs="opencv_core">
     <sources>
       tRansacPlane3D.h
     </sources>
-  </rrlib>
-
-  <testprogram name="least_squares_polynomial">
-    <sources>
-      test/test_least_squares_polynomial.cpp
-    </sources>
-  </testprogram>
-
-  <testprogram name="particle_filter">
-    <sources>
-      test/test_particle_filter.cpp
-    </sources>
-  </testprogram>
-
-  <testprogram name="ransac_color_detection"
-        libs="opencv_all">
-    <sources>
-      test/test_ransac_color_detection.cpp
-    </sources>
-  </testprogram>
-
-  <testprogram name="cluster_analysis">
-    <sources>
-      test/test_cluster_analysis.cpp
-    </sources>
-  </testprogram>
+  </library>
 
 </targets>

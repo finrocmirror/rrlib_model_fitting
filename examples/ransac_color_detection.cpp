@@ -19,9 +19,9 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    test_ransac_color_fittingl.cpp
+/*!\file    rrlib/model_fitting/examples/ransac_color_fittingl.cpp
  *
- * \author  Tobias Foehst
+ * \author  Tobias Föhst
  *
  * \date    2011-03-19
  *

@@ -19,9 +19,9 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    test_cluster_analysis.cpp
+/*!\file    rrlib/model_fitting/examples/cluster_analysis.cpp
  *
- * \author  Tobias Foehst
+ * \author  Tobias Föhst
  *
  * \date    2012-01-08
  *

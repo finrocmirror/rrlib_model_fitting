@@ -19,9 +19,9 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //
 //----------------------------------------------------------------------
-/*!\file    test_particle_filter.cpp
+/*!\file    rrlib/model_fitting/examples/particle_filter.cpp
  *
- * \author  Tobias Foehst
+ * \author  Tobias Föhst
  *
  * \date    2011-01-19
  *

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE targets PUBLIC "-//RRLIB//DTD make 1.0" "http://rrlib.org/xml/1.0/make.dtd">
+<targets>
+
+  <program name="least_squares_polynomial" sources="least_squares_polynomial.cpp" />
+  <program name="particle_filter" sources="particle_filter.cpp" />
+  <program name="ransac_color_detection" sources="ransac_color_detection.cpp" />
+  <program name="cluster_analysis" sources="cluster_analysis.cpp" />
+
+</targets>
