@@ -159,7 +159,10 @@ tIterativeClosestPoint<Tdimension>::tIterativeClosestPoint(TModelIterator model_
   model(model_begin, model_end),
   data(data_begin, data_end)
 {
-  this->DoICP(sufficient_improvement_threshold, max_iterations);
+  if (!this->DoICP(sufficient_improvement_threshold, max_iterations))
+  {
+    throw util::tTraceableException<std::runtime_error>("Could not run ICP algorithm.");
+  }
 }
 
 //----------------------------------------------------------------------
@@ -198,8 +201,14 @@ void tIterativeClosestPoint<Tdimension>::SetData(TIterator begin, TIterator end)
 // tIterativeClosestPoint DoICP
 //----------------------------------------------------------------------
 template <size_t Tdimension>
-void tIterativeClosestPoint<Tdimension>::DoICP(double sufficient_improvement_threshold, unsigned int max_iterations)
+bool tIterativeClosestPoint<Tdimension>::DoICP(double sufficient_improvement_threshold, unsigned int max_iterations)
 {
+  if (this->model.empty() || this->data.empty())
+  {
+    RRLIB_LOG_PRINT(ERROR, "ICP called on empty point set");
+    return false;
+  }
+
   assert(this->model.size() >= 2 && this->data.size() >= 2);
 #ifdef RRLIB_MODEL_FITTING_DEBUG_ICP
   static_assert(Tdimension == 2, "Debug visualization of ICP is only supported for 2D");
@@ -274,6 +283,8 @@ void tIterativeClosestPoint<Tdimension>::DoICP(double sufficient_improvement_thr
   }
   window.Render();
 #endif
+
+  return true;
 }
 
 //----------------------------------------------------------------------
@@ -344,6 +355,7 @@ const std::vector<math::tVector<Tdimension>> &tIterativeClosestPoint<Tdimension>
 template <size_t Tdimension>
 void tIterativeClosestPoint<Tdimension>::FindCorrespondencePairs(std::vector<double> &distances, const std::vector<tSample> &model)
 {
+  assert(!(model.empty() || this->data.empty()));
   this->correspondence_pairs.clear();
   distances.clear();
   for (size_t i = 0; i < model.size(); ++i)
@@ -370,6 +382,7 @@ void tIterativeClosestPoint<Tdimension>::FindCorrespondencePairs(std::vector<dou
 template <size_t Tdimension>
 void tIterativeClosestPoint<Tdimension>::FilterCorrespondencePairs(std::vector<double> &distances)
 {
+  assert(distances.size() == this->correspondence_pairs.size());
   std::vector<std::pair<size_t, size_t>> filtered_correspondence_pairs;
   std::vector<double> filtered_distances;
   std::vector<size_t> index(distances.size());
