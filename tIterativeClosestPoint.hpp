@@ -372,18 +372,25 @@ void tIterativeClosestPoint<Tdimension>::FilterCorrespondencePairs(std::vector<d
 {
   std::vector<std::pair<size_t, size_t>> filtered_correspondence_pairs;
   std::vector<double> filtered_distances;
-  auto sorted_distances = distances;
-  std::sort(sorted_distances.begin(), sorted_distances.end());
-  const auto median = sorted_distances[sorted_distances.size() / 2];
+  std::vector<size_t> index(distances.size());
   for (size_t i = 0; i < distances.size(); ++i)
   {
-    if (distances[i] <= Tdimension * median)
+    index[i] = i;
+  }
+  auto median = index.begin() + index.size() / 2;
+  std::nth_element(index.begin(), median, index.end(), [&distances](size_t a, size_t b)
+  {
+    return distances[a] < distances[b];
+  });
+  for (size_t i = 0; i < distances.size(); ++i)
+  {
+    if (distances[i] <= Tdimension * distances[*median])
     {
-      filtered_correspondence_pairs.emplace_back(correspondence_pairs[i]);
+      filtered_correspondence_pairs.emplace_back(std::move(this->correspondence_pairs[i]));
       filtered_distances.emplace_back(distances[i]);
     }
   }
-  correspondence_pairs = std::move(filtered_correspondence_pairs);
+  this->correspondence_pairs = std::move(filtered_correspondence_pairs);
   distances = std::move(filtered_distances);
 }
 
@@ -405,7 +412,7 @@ auto tIterativeClosestPoint<Tdimension>::FindRotation(const std::vector<tSample>
 
   using tMatrix = math::tMatrix<Tdimension, Tdimension>;
   tMatrix h;
-  for (const auto & c : correspondence_pairs)
+  for (const auto & c : this->correspondence_pairs)
   {
     h += tMatrix(model[c.first] + translation, this->data[c.second]);
   }

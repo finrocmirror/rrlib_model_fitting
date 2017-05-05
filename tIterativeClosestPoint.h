@@ -122,8 +122,10 @@ public:
    *
    * \param sufficient_improvement_threshold   If the errors of two successive iterations are lower the algorithm terminates
    * \param max_iterations                     Maximum number of iterations until the algorithm terminates without further convergence
+   *
+   * \returns false when input data was not suitable for running ICP, true otherwise indicating success
    */
-  void DoICP(double sufficient_improvement_threshold = 1E-10, unsigned int max_iterations = 500);
+  bool DoICP(double sufficient_improvement_threshold = 1E-10, unsigned int max_iterations = 500);
 
   /*! Access the originally stored model samples
    *
